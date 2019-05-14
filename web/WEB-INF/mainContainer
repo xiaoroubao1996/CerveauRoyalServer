@@ -1,0 +1,4 @@
+main=true
+gui=false
+platform-id=cerveauroyal
+local-port=1099

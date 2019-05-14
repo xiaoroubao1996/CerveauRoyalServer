@@ -1,5 +1,9 @@
 package servlet;
 
+import SMA.ProcessBehaviour;
+import jade.core.behaviours.Behaviour;
+import jade.wrapper.gateway.JadeGateway;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -29,7 +33,11 @@ public class HelloServlet extends HttpServlet {
 		System.out.println("¥¶¿ÌGet«Î«Û°£°£°£");
 		response.setContentType("text/html;charset=utf-8");
 		PrintWriter out = response.getWriter();
-		
+
+		ProcessBehaviour behaviour = new ProcessBehaviour("testAgent", "this is content");
+		activeAgent(behaviour);
+
+		out.println(behaviour.answer);
 		out.println("<strong>Hello servlet</strong>");
 		out.flush();
 		out.close();
@@ -47,6 +55,14 @@ public class HelloServlet extends HttpServlet {
 		out.println("<strong>Hello servlet</strong>");
 		out.flush();
 		out.close();
+	}
+
+	private void activeAgent(Behaviour behaviour) {
+		try {
+			JadeGateway.execute(behaviour);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

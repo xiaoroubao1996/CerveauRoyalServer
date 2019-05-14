@@ -12,4 +12,10 @@
         <servlet-name>HelloServlet</servlet-name>
         <url-pattern>/servlet/HelloServlet</url-pattern>
     </servlet-mapping>
+
+     <listener>
+
+        <listener-class>Llistener.ServletContextJade</listener-class>
+
+    </listener>
 </web-app>
