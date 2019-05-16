@@ -1,6 +1,5 @@
-package Llistener;
+package Listener;
 
-import Model.Constant;
 import jade.wrapper.AgentContainer;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
@@ -41,47 +40,6 @@ public class ServletContextJade implements ServletContextListener {
                          ex.printStackTrace();
                      }
 
-//                 ServletContext sct=sce.getServletContext();
-//
-//                 Map<Integer,String> depts=new HashMap<Integer,String>();
-//
-//                 Connection connection=null;
-//
-//                 PreparedStatement pstm=null;
-//
-//                 ResultSet rs=null;
-//
-//                 try{
-//
-//                         connection=ConnectTool.getConnection();
-//
-//                         String sql="select deptNo,dname from dept";
-//
-//                         pstm=connection.prepareStatement(sql);
-//
-//                         rs=pstm.executeQuery();
-//
-//                         while(rs.next()){
-//
-//                                 depts.put(rs.getInt(1), rs.getString(2));
-//
-//                             }
-//
-//                         // 将所取到的值存放到一个属性键值对中
-//
-//                         sct.setAttribute("dept", depts);
-//
-//                         System.out.println("======listener test is beginning=========");
-//
-//                     }catch(Exception e){
-//
-//                         e.printStackTrace();
-//
-//                     }finally{
-//
-//                         ConnectTool.releasersc(rs, pstm, connection);
-//
-//                     }
 
              }
 

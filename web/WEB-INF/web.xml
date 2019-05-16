@@ -10,12 +10,12 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>HelloServlet</servlet-name>
-        <url-pattern>/servlet/HelloServlet</url-pattern>
+        <url-pattern>/*</url-pattern>
     </servlet-mapping>
 
      <listener>
 
-        <listener-class>Llistener.ServletContextJade</listener-class>
+        <listener-class>Listener.ServletContextJade</listener-class>
 
     </listener>
 </web-app>
