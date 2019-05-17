@@ -1,8 +1,10 @@
 package Model;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private Integer id;
-    private String nickName;
+    private String nickname;
     private Integer avatar;
     private String email;
     private String password;
@@ -25,9 +27,9 @@ public class User {
     private Integer numLoseCommonsense;
     private String deviceToken;
 
-    public User(Integer id, String nickName, Integer avatar, String email, String password, String deviceToken){
-        this.id = id;
-        this.nickName = nickName;
+    public User(String nickname, Integer avatar, String email, String password, String deviceToken){
+        this.id = 0;
+        this.nickname = nickname;
         this.avatar = avatar;
         this.email = email;
         this.password = password;
@@ -50,9 +52,10 @@ public class User {
         this.numLoseCommonsense = 0;
         this.deviceToken = deviceToken;
     }
-    public User(Integer id, String nickName, Integer avatar, String email, String password, Integer score, Integer numWinLiterature, Integer numLoseLiterature, Integer numWinMath, Integer numLoseMath, Integer numWinArt, Integer numLoseArt, Integer numWinHistory, Integer numLoseHistory, Integer numWinMusic, Integer numLoseMusic, Integer numWinGeography, Integer numLoseGeography, Integer numWinEnglish, Integer numLoseEnglish, Integer numWinCommonsense, Integer numLoseCommonsense, String deviceToken) {
+
+    public User(Integer id, String email, String nickname, Integer avatar,  String password, Integer score, Integer numWinLiterature, Integer numLoseLiterature, Integer numWinMath, Integer numLoseMath, Integer numWinArt, Integer numLoseArt, Integer numWinHistory, Integer numLoseHistory, Integer numWinMusic, Integer numLoseMusic, Integer numWinGeography, Integer numLoseGeography, Integer numWinEnglish, Integer numLoseEnglish, Integer numWinCommonsense, Integer numLoseCommonsense, String deviceToken) {
         this.id = id;
-        this.nickName = nickName;
+        this.nickname = nickname;
         this.avatar = avatar;
         this.email = email;
         this.password = password;
@@ -84,12 +87,12 @@ public class User {
         this.id = id;
     }
 
-    public String getNickName() {
-        return nickName;
+    public String getnickname() {
+        return nickname;
     }
 
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
+    public void setnickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public Integer getAvatar() {

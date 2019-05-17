@@ -1,18 +1,22 @@
 package Model;
 
-public class Question {
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
+
+import java.io.Serializable;
+
+public class Question implements Serializable {
     private Integer id;
-    private String subject;
+    private Constant.SUBJECT subject;
     private String text;
     private String option1;
     private String option2;
     private String option3;
     private String option4;
-    private String answer;
+    private Integer answer;
 
-    public Question(Integer id, String subject, String text, String option1, String option2, String option3, String option4, String answer) {
+    public Question(Integer id, String subject, String text, String option1, String option2, String option3, String option4, Integer answer) {
         this.id = id;
-        this.subject = subject;
+        this.subject = Constant.SUBJECT.valueOf(subject);
         this.text = text;
         this.option1 = option1;
         this.option2 = option2;
@@ -30,12 +34,12 @@ public class Question {
         this.id = id;
     }
 
-    public String getSubject() {
+    public Constant.SUBJECT getSubject() {
         return subject;
     }
 
     public void setSubject(String subject) {
-        this.subject = subject;
+        this.subject = Constant.SUBJECT.valueOf(subject);
     }
 
     public String getText() {
@@ -78,11 +82,11 @@ public class Question {
         this.option4 = option4;
     }
 
-    public String getAnswer() {
+    public Integer getAnswer() {
         return answer;
     }
 
-    public void setAnswer(String answer) {
+    public void setAnswer(Integer answer) {
         this.answer = answer;
     }
 }

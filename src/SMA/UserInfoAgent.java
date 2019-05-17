@@ -14,8 +14,8 @@ public class UserInfoAgent extends Agent {
     /**
      * do something when get the message
      *  REQUEST: get
-     *  INFORM: put(create)
-     *  PROPOSE: post(update)
+     *  INFORM: put(update)
+     *  PROPOSE: post(create)
      */
     private class waitMsgBehaviour extends CyclicBehaviour {
 

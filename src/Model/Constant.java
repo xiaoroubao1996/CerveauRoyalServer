@@ -1,6 +1,18 @@
 package Model;
 
 public class Constant {
+    public enum SUBJECT {
+        ART,
+        COMMONSENSE,
+        ENGLISH,
+        GEOGRAPHY,
+        HISTORY,
+        LITERATURE,
+        MATH,
+        MUSIC
+    }
+
+
     //String
     public static final String ENVIRONEMENT_NAME = "environement";
 
