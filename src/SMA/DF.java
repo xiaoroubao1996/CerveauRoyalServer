@@ -45,4 +45,13 @@ public class DF {
 		}
 		return rec;
 	}
+
+	public static void removeAgents(Agent agent, AID name) {
+		try {
+			DFService.deregister(agent, name);
+		} catch (FIPAException e) {
+			System.err.println("Unable to remove agent " + name);
+			e.printStackTrace();
+		}
+	}
 }

@@ -11,6 +11,8 @@ public class ServletContextJade implements ServletContextListener {
 
               // 实现其中的销毁函数
 
+              public static AgentContainer cc;
+
               public void contextDestroyed(ServletContextEvent sce) {
 
                  System.out.println("this is last destroyeed");
@@ -33,7 +35,7 @@ public class ServletContextJade implements ServletContextListener {
                          p.setParameter("local-port", "1098");
 
 
-                         AgentContainer cc = rt.createMainContainer(p);
+                         cc = rt.createMainContainer(p);
                          cc.createNewAgent("testAgent", "SMA.testAgent",null).start();
                          System.out.println("Jade initialized");
                      } catch (Exception ex) {

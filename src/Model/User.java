@@ -1,5 +1,8 @@
 package Model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
 import java.io.Serializable;
 
 public class User implements Serializable {
@@ -261,5 +264,27 @@ public class User implements Serializable {
 
     public void setDeviceToken(String deviceToken) {
         this.deviceToken = deviceToken;
+    }
+
+    public String toJSON() {
+        ObjectMapper mapper = new ObjectMapper();
+        String s = "";
+        try {
+            s = mapper.writeValueAsString(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return s;
+    }
+
+    public static User read(String jsonString) {
+        ObjectMapper mapper = new ObjectMapper();
+        User user = null;
+        try {
+            user = mapper.readValue(jsonString, User.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return user;
     }
 }
