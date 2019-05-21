@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.Serializable;
 
-public class Question  extends JSON implements Serializable {
+public class Question implements Serializable {
     private Integer id;
     private Constant.SUBJECT subject;
     private String text;
