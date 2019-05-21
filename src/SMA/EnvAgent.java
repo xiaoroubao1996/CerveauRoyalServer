@@ -1,5 +1,9 @@
-package src.SMA;
+package SMA;
 
-public class EnvAgent {
+import jade.core.Agent;
 
+public class EnvAgent extends Agent{
+	protected void setup() {
+	 
+ }
 }
