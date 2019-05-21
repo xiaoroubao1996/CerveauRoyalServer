@@ -1,5 +1,6 @@
 package SMA;
 
+import Model.JadeModel;
 import Model.User;
 import SMA.MatchAgent;
 import Listener.ServletContextJade;
@@ -75,7 +76,7 @@ public class SearchMatchAgent extends Agent {
                List<Object> params = new ArrayList<Object>();
                params.add(subject);
                params.add(user1);
-               ServletContextJade.cc.createNewAgent("matchxxx", "SMA.MatchAgent",params.toArray()).start();
+               JadeModel.getContainer().createNewAgent("matchxxx", "SMA.MatchAgent",params.toArray()).start();
            } catch (StaleProxyException e) {
                e.printStackTrace();
            }

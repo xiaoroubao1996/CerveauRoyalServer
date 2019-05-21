@@ -22,7 +22,7 @@ public class MatchAgent extends Agent {
 	private String matchSubject;
 	private ArrayList<Question> questionsList;
 	private String questionsJson;
-	private ACLMessage reply; 
+	private ACLMessage reply;
 
 	protected void setup() {
 		System.out.println(getLocalName() + "--> Installed");
@@ -41,7 +41,7 @@ public class MatchAgent extends Agent {
 
 		// The main behaviour in this Agent
 		SequentialBehaviour MatchSequentialBehaviour = new SequentialBehaviour();
-		
+
 		// 1
 		// First sub-behaviour in the main sequential behaviour
 		ParallelBehaviour waitSecondUserParllelBehaivour = new ParallelBehaviour(ParallelBehaviour.WHEN_ANY);
@@ -59,35 +59,35 @@ public class MatchAgent extends Agent {
 		waitUser2SendQuesSequential.addSubBehaviour(replyWithDataBehaviour);
 		//end 1.1
 		waitSecondUserParllelBehaivour.addSubBehaviour(waitUser2SendQuesSequential);
-		
-		
+
+
 		//start 1.2
 		DeleteOutOfTimeBehaviour deleteOutOfTimeBehaviour = new DeleteOutOfTimeBehaviour(this,Constant.MATCH_WAIT_TIME_MAX);
 		//end 1.2
 		waitSecondUserParllelBehaivour.addSubBehaviour(deleteOutOfTimeBehaviour);
-		
+
 		//end 1
 		MatchSequentialBehaviour.addSubBehaviour(waitSecondUserParllelBehaivour);
-		
-		
-		
+
+
+
 		// 2
 		// Second sub-behaviour in the main sequential behaviour
 		CountingBehaviour countingBehaviour = new CountingBehaviour();
 		//end 2
 		MatchSequentialBehaviour.addSubBehaviour(countingBehaviour);
-		
-		
+
+
 		//3
 		// Third sub-behaviour in the main sequential behaviour
 		GameOverBehaviour gameOverBehaviour = new GameOverBehaviour();
 		//end 3
 		MatchSequentialBehaviour.addSubBehaviour(gameOverBehaviour);
 
-		
+
 		addBehaviour(MatchSequentialBehaviour);
 	}
-	
+
 	private class GameOverBehaviour extends Behaviour{
 
 		@Override
@@ -104,7 +104,7 @@ public class MatchAgent extends Agent {
 				user1Win = false;
 				user2Win = true;
 			}
-			
+
 
 			//update the score of user 1 and user 2
 			//{userId:xx, subject:xxx,win:true}
@@ -114,16 +114,16 @@ public class MatchAgent extends Agent {
 					"\", \"subject\": \""+matchSubject+
 					"\",\"isWinner\":\""+user1Win+"\"}");
 			myAgent.send(m);
-			
+
 			m = new ACLMessage(ACLMessage.INFORM);
 			m.addReceiver(new AID("UserInfoAgent", AID.ISLOCALNAME));
 			m.setContent("{\"userId\":\""+user2.getId()+
 					"\", \"subject\": \""+matchSubject+
 					"\",\"isWinner\":\""+user2Win+"\"}");
 			myAgent.send(m);
-			
-			myAgent.doDelete();			
-		
+
+			myAgent.doDelete();
+
 		}
 
 		@Override
@@ -131,17 +131,17 @@ public class MatchAgent extends Agent {
 			return false;
 		}
 	}
-	
+
 	private class CountingBehaviour extends Behaviour{
 
 		int iterator = 0 ;
 		int step = 0;
-		long endTime = System.currentTimeMillis() + 15000;		
+		long endTime = System.currentTimeMillis() + 15000;
 		int user1Res;
 		int user2Res;
 		int correctRes;
 		String msgJson;
-		
+
 		@Override
 		public void action() {
 			switch(step) {
@@ -154,18 +154,18 @@ public class MatchAgent extends Agent {
 					MessageTemplate mt1 = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
 							MessageTemplate.MatchSender(new AID("EnvAgent", AID.ISLOCALNAME)));
 					ACLMessage message1 = receive(mt1);
-					
+
 					MessageTemplate mt2 = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
 							MessageTemplate.MatchSender(new AID("EnvAgent", AID.ISLOCALNAME)));
 					ACLMessage message2 = receive(mt2);
-					
+
 					if (message1 != null && message2 != null) {
 						msgJson = message1.getContent();
 						checkMsg(msgJson);
 
 						msgJson = message2.getContent();
-						checkMsg(msgJson);		
-						
+						checkMsg(msgJson);
+
 						step++;
 					} else {
 						block();
@@ -180,22 +180,22 @@ public class MatchAgent extends Agent {
 				m.setContent("{\"msgTo\":\""+user2.getId()+
 						"\", \"opponent\": \""+user1.getId()+"\",\"score\":\""+user1Score+"\", \"choice\": \""+user1Res+"\"}");
 				myAgent.send(m);
-				
+
 				m = new ACLMessage(ACLMessage.INFORM);
 				m.addReceiver(new AID("EnvAgent", AID.ISLOCALNAME));
 				m.setContent("{\"msgTo\":\""+user1.getId()+
 						"\", \"opponent\": \""+user2.getId()+"\",\"score\":\""+user2Score+"\", \"choice\": \""+user2Res+"\"}");
 				myAgent.send(m);
-				
+
 				iterator++;
 				break;
 			}
-			
+
 		}
-		
+
 		//get the response of a specific user
 		private void checkMsg(String msg) {
-            JsonNode rootNode = mapper.readTree(msg); 
+            JsonNode rootNode = mapper.readTree(msg);
 			//{UserId: xxx, Option: 2, Score: xxx}
 			if(json.getString("UserId") == user1.getId()) {
 				user1Res = Integer.parseInt(rootNode.path("Option").asText());
@@ -204,7 +204,7 @@ public class MatchAgent extends Agent {
 				user2Res = Integer.parseInt(rootNode.path("Option").asText());
 				user2Score = Integer.parseInt(rootNode.path("Score").asText());
 			}
-			
+
 		}
 
 		@Override
@@ -215,13 +215,13 @@ public class MatchAgent extends Agent {
 			}
 			return isDone;
 		}
-		
+
 	}
 
 	private class RequestDataBehaviour extends Behaviour {
 		int step = 0;
 		Boolean isDone = false;
-		
+
 		@Override
 		public void action() {
 			switch (step) {
@@ -239,7 +239,7 @@ public class MatchAgent extends Agent {
 				MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST),
 						MessageTemplate.MatchSender(new AID("questionDataAgent", AID.ISLOCALNAME)));
 				ACLMessage message = receive(mt);
-				
+
 				if (message != null) {
 					questionsJson = message.getContent();
 					//TODO
@@ -259,7 +259,7 @@ public class MatchAgent extends Agent {
 
 	}
 
-	
+
 	private class ReplyWithDataBehaviour extends OneShotBehaviour {
 
 		@Override
@@ -268,9 +268,9 @@ public class MatchAgent extends Agent {
 			// TODO: in SearchMatchAgent set this message replyTo EnvAgent
 			// TODO: User.getUserId()
 			reply.setContent(generateReplyJson(String.valueOf(user1.getId()), String.valueOf(user2.getId()), questionsJson));
-			send(reply);	
+			send(reply);
 		}
-		
+
 
 		private String generateReplyJson(String user1Id, String user2Id, String message) {
 			String jsonString;
@@ -279,9 +279,9 @@ public class MatchAgent extends Agent {
 			jsonString = "{\"User1\":\"" + user1Id + "\",\"User2\":\"" + user2Id + "\","+msgJson+"}";
 			return jsonString;
 		}
-		
-	} 
-	
+
+	}
+
 	/**
 	 * wait for second user to join in the game do something when get the message
 	 */
