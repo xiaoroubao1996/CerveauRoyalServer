@@ -1,9 +1,11 @@
 package SMA;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import Model.Constant;
 import Model.Question;
@@ -195,15 +197,21 @@ public class MatchAgent extends Agent {
 		
 		//get the response of a specific user
 		private void checkMsg(String msg) {
-            JsonNode rootNode = mapper.readTree(msg); 
-			//{UserId: xxx, Option: 2, Score: xxx}
-			if(json.getString("UserId") == user1.getId()) {
-				user1Res = Integer.parseInt(rootNode.path("Option").asText());
-				user1Score = Integer.parseInt(rootNode.path("Score").asText());
-			}else {
-				user2Res = Integer.parseInt(rootNode.path("Option").asText());
-				user2Score = Integer.parseInt(rootNode.path("Score").asText());
-			}
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode rootNode;
+			try {
+				rootNode = mapper.readTree(msg);
+				//{UserId: xxx, Option: 2, Score: xxx}
+				if(Integer.parseInt(rootNode.path("UserId").asText()) == user1.getId()) {
+					user1Res = Integer.parseInt(rootNode.path("Option").asText());
+					user1Score = Integer.parseInt(rootNode.path("Score").asText());
+				}else {
+					user2Res = Integer.parseInt(rootNode.path("Option").asText());
+					user2Score = Integer.parseInt(rootNode.path("Score").asText());
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} 
 			
 		}
 
