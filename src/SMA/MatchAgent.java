@@ -34,7 +34,6 @@ public class MatchAgent extends Agent {
 
 		matchSubject = (String) map.get("Subject");
 		user1 = (User) map.get("user");
-		// TODO: User.getLevel()
 		String matchLevel = user1.getRank();
 
 		// register this MatchAgent into the DF
@@ -274,7 +273,6 @@ public class MatchAgent extends Agent {
 		public void action() {
 			// reply to the Env "we get user2 and we get Data, ready to go"
 			// TODO: in SearchMatchAgent set this message replyTo EnvAgent
-			// TODO: User.getUserId()
 			reply.setContent(generateReplyJson(String.valueOf(user1.getId()), String.valueOf(user2.getId()), questionsJson));
 			send(reply);	
 		}
@@ -306,9 +304,8 @@ public class MatchAgent extends Agent {
 				ACLMessage reply = message.createReply();
 				String content = message.getContent();
 
-				// Get user2 info and add into this room
-				// TODO: content is a json of a user object
-				// TODO: user2 = userJsonToObject(Content);
+				// Get user2 info and add into this room, content is a json of a user object
+				user2 = User.read(content);
 
 				done = true;
 			} else
