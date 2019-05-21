@@ -51,7 +51,7 @@ public class SearchMatchAgent extends Agent {
 
         @Override
         public void action() {
-             List matches = new ArrayList<AID>(DF.findAgents(this, subject, user1.getLevel()));
+             List matches = new ArrayList<AID>(DF.findAgents(myAgent, subject, user1.getRank()));
              if (matches.size() > 0) {
                  response = new ACLMessage(ACLMessage.CONFIRM);
                  response.addReceiver(new AID("Environment",AID.ISLOCALNAME));

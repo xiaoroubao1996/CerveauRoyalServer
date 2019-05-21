@@ -1,5 +1,10 @@
 package SMA;
 
+import java.util.ArrayList;
+import java.util.Map;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
 import Model.Constant;
 import Model.Question;
 import Model.User;
@@ -28,7 +33,7 @@ public class MatchAgent extends Agent {
 		matchSubject = (String) map.get("Subject");
 		user1 = (User) map.get("user");
 		// TODO: User.getLevel()
-		String matchLevel = user1.getLevel();
+		String matchLevel = user1.getRank();
 
 		// register this MatchAgent into the DF
 		DF.registerAgent(this, matchSubject, matchLevel);
@@ -110,7 +115,7 @@ public class MatchAgent extends Agent {
 					"\",\"isWinner\":\""+user1Win+"\"}");
 			myAgent.send(m);
 			
-			ACLMessage m = new ACLMessage(ACLMessage.INFORM);
+			m = new ACLMessage(ACLMessage.INFORM);
 			m.addReceiver(new AID("UserInfoAgent", AID.ISLOCALNAME));
 			m.setContent("{\"userId\":\""+user2.getId()+
 					"\", \"subject\": \""+matchSubject+
@@ -176,7 +181,7 @@ public class MatchAgent extends Agent {
 						"\", \"opponent\": \""+user1.getId()+"\",\"score\":\""+user1Score+"\", \"choice\": \""+user1Res+"\"}");
 				myAgent.send(m);
 				
-				ACLMessage m = new ACLMessage(ACLMessage.INFORM);
+				m = new ACLMessage(ACLMessage.INFORM);
 				m.addReceiver(new AID("EnvAgent", AID.ISLOCALNAME));
 				m.setContent("{\"msgTo\":\""+user1.getId()+
 						"\", \"opponent\": \""+user2.getId()+"\",\"score\":\""+user2Score+"\", \"choice\": \""+user2Res+"\"}");
@@ -262,8 +267,17 @@ public class MatchAgent extends Agent {
 			// reply to the Env "we get user2 and we get Data, ready to go"
 			// TODO: in SearchMatchAgent set this message replyTo EnvAgent
 			// TODO: User.getUserId()
-			reply.setContent(generateReplyJson(user1.getUserId(), user2.getUserId(), questionsJson));
+			reply.setContent(generateReplyJson(String.valueOf(user1.getId()), String.valueOf(user2.getId()), questionsJson));
 			send(reply);	
+		}
+		
+
+		private String generateReplyJson(String user1Id, String user2Id, String message) {
+			String jsonString;
+			String msgJson;
+			msgJson = message.substring(1, message.length());
+			jsonString = "{\"User1\":\"" + user1Id + "\",\"User2\":\"" + user2Id + "\","+msgJson+"}";
+			return jsonString;
 		}
 		
 	} 
@@ -312,12 +326,5 @@ public class MatchAgent extends Agent {
 		}
 	}
 
-	private String generateReplyJson(String user1Id, String user2Id, String message) {
-		String jsonString;
-		String msgJson;
-		msgJson = message.substring(1, message.length());
-		jsonString = "{\"User1\":\"" + user1Id + "\",\"User2\":\"" + user2Id + "\","+msgJson+"}";
-		return jsonString;
-	}
 
 }
