@@ -2,7 +2,7 @@ package SMA;
 
 import Model.User;
 import SMA.MatchAgent;
-import Listener.ServletContextJade
+import Listener.ServletContextJade;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;

@@ -16,6 +16,8 @@ public class Question implements Serializable {
     private String option4;
     private Integer answer;
 
+    private Question(){}
+
     public Question(Integer id, String subject, String text, String option1, String option2, String option3, String option4, Integer answer) {
         this.id = id;
         this.subject = Constant.SUBJECT.valueOf(subject);

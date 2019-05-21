@@ -32,6 +32,7 @@ public class User implements Serializable {
     private String deviceToken;
     private String rank;
 
+    private User(){}
     public User(String nickname, Integer avatar, String email, String password, String deviceToken){
         this.id = 0;
         this.nickname = nickname;

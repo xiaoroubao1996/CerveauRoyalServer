@@ -71,7 +71,8 @@ public class UserInfoAgent extends Agent {
                         content = message.getContent();
                         System.out.println(myAgent.getLocalName() + "--> getPropose ");
 
-
+                        user = User.read(content);
+                        DAOFactory.getUserDAO().add(user);
                         //create reply
                         reply = message.createReply();
                         reply.setContent("wow");
