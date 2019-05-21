@@ -71,6 +71,7 @@ public class UserInfoAgent extends Agent {
                         content = message.getContent();
                         System.out.println(myAgent.getLocalName() + "--> getPropose ");
 
+
                         //create reply
                         reply = message.createReply();
                         reply.setContent("wow");
