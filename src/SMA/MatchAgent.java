@@ -9,14 +9,11 @@ import jade.core.behaviours.*;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
-import java.util.ArrayList;
-import java.util.Map;
-
 public class MatchAgent extends Agent {
 	private User user1;
 	private User user2;
-	private int userScore1;
-	private int userScore2;
+	private int user1Score;
+	private int user2Score;
 	private String matchSubject;
 	private ArrayList<Question> questionsList;
 	private String questionsJson;
@@ -90,9 +87,38 @@ public class MatchAgent extends Agent {
 
 		@Override
 		public void action() {
+			Boolean user1Win;
+			Boolean user2Win;
+			if(user1Score > user2Score) {
+				user1Win = true;
+				user2Win = false;
+			}else if (user1Score == user2Score) {
+				user1Win = true;
+				user2Win = true;
+			}else {
+				user1Win = false;
+				user2Win = true;
+			}
+			
+
 			//update the score of user 1 and user 2
+			//{userId:xx, subject:xxx,win:true}
+			ACLMessage m = new ACLMessage(ACLMessage.INFORM);
+			m.addReceiver(new AID("UserInfoAgent", AID.ISLOCALNAME));
+			m.setContent("{\"userId\":\""+user1.getId()+
+					"\", \"subject\": \""+matchSubject+
+					"\",\"isWinner\":\""+user1Win+"\"}");
+			myAgent.send(m);
+			
+			ACLMessage m = new ACLMessage(ACLMessage.INFORM);
+			m.addReceiver(new AID("UserInfoAgent", AID.ISLOCALNAME));
+			m.setContent("{\"userId\":\""+user2.getId()+
+					"\", \"subject\": \""+matchSubject+
+					"\",\"isWinner\":\""+user2Win+"\"}");
+			myAgent.send(m);
 			
 			myAgent.doDelete();			
+		
 		}
 
 		@Override
@@ -142,11 +168,18 @@ public class MatchAgent extends Agent {
 				}
 				break;
 			case'1':
-				//return the option chosen by another user 
-				//{"user1":"id", "choice1": "x","user2":"id", "choice2": "x"}
+				//return the option chosen by another user as well as the score of another user
+				//{"msgTo":"id", "opponent": "id","score":"x", "choice": "x"}
 				ACLMessage m = new ACLMessage(ACLMessage.INFORM);
 				m.addReceiver(new AID("EnvAgent", AID.ISLOCALNAME));
-				m.setContent("{\"user1\":\""+user1.getId()+"\", \"choice1\": \""+user1Res+"\",\"user2\":\""+user2.getId()+"\", \"choice2\": \""+user2Res+"\"}");
+				m.setContent("{\"msgTo\":\""+user2.getId()+
+						"\", \"opponent\": \""+user1.getId()+"\",\"score\":\""+user1Score+"\", \"choice\": \""+user1Res+"\"}");
+				myAgent.send(m);
+				
+				ACLMessage m = new ACLMessage(ACLMessage.INFORM);
+				m.addReceiver(new AID("EnvAgent", AID.ISLOCALNAME));
+				m.setContent("{\"msgTo\":\""+user1.getId()+
+						"\", \"opponent\": \""+user2.getId()+"\",\"score\":\""+user2Score+"\", \"choice\": \""+user2Res+"\"}");
 				myAgent.send(m);
 				
 				iterator++;
@@ -157,12 +190,14 @@ public class MatchAgent extends Agent {
 		
 		//get the response of a specific user
 		private void checkMsg(String msg) {
-			//{UserId: xxx; Option: 2}
-			JSONObject json = new JSONObject(msg);
+            JsonNode rootNode = mapper.readTree(msg); 
+			//{UserId: xxx, Option: 2, Score: xxx}
 			if(json.getString("UserId") == user1.getId()) {
-				user1Res = Integer.parseInt(json.getString("Option"));
+				user1Res = Integer.parseInt(rootNode.path("Option").asText());
+				user1Score = Integer.parseInt(rootNode.path("Score").asText());
 			}else {
-				user2Res = Integer.parseInt(json.getString("Option"));
+				user2Res = Integer.parseInt(rootNode.path("Option").asText());
+				user2Score = Integer.parseInt(rootNode.path("Score").asText());
 			}
 			
 		}
