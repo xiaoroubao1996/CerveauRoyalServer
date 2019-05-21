@@ -1,5 +1,8 @@
 package Model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
 import java.io.Serializable;
 
 public class Friends implements Serializable {
@@ -39,5 +42,27 @@ public class Friends implements Serializable {
 
     public void setUser2Id(Integer user2Id) {
         this.user2Id = user2Id;
+    }
+
+    public String toJSON() {
+        ObjectMapper mapper = new ObjectMapper();
+        String s = "";
+        try {
+            s = mapper.writeValueAsString(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return s;
+    }
+
+    public static Friends read(String jsonString) {
+        ObjectMapper mapper = new ObjectMapper();
+        Friends friends = null;
+        try {
+            friends = mapper.readValue(jsonString, Friends.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return friends;
     }
 }

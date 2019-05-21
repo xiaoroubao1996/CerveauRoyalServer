@@ -1,10 +1,12 @@
 package Model;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
 import java.io.Serializable;
 
-public class Question implements Serializable {
+public class Question  extends JSON implements Serializable {
     private Integer id;
     private Constant.SUBJECT subject;
     private String text;
@@ -88,5 +90,27 @@ public class Question implements Serializable {
 
     public void setAnswer(Integer answer) {
         this.answer = answer;
+    }
+
+    public String toJSON() {
+        ObjectMapper mapper = new ObjectMapper();
+        String s = "";
+        try {
+            s = mapper.writeValueAsString(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return s;
+    }
+
+    public static Question read(String jsonString) {
+        ObjectMapper mapper = new ObjectMapper();
+        Question question = null;
+        try {
+            question = mapper.readValue(jsonString, Question.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return question;
     }
 }

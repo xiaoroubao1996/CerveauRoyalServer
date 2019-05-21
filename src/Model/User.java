@@ -29,6 +29,7 @@ public class User implements Serializable {
     private Integer numWinCommonsense;
     private Integer numLoseCommonsense;
     private String deviceToken;
+    private String rank;
 
     public User(String nickname, Integer avatar, String email, String password, String deviceToken){
         this.id = 0;
@@ -54,6 +55,7 @@ public class User implements Serializable {
         this.numWinCommonsense = 0;
         this.numLoseCommonsense = 0;
         this.deviceToken = deviceToken;
+        setRankByScore();
     }
 
     public User(Integer id, String email, String nickname, Integer avatar,  String password, Integer score, Integer numWinLiterature, Integer numLoseLiterature, Integer numWinMath, Integer numLoseMath, Integer numWinArt, Integer numLoseArt, Integer numWinHistory, Integer numLoseHistory, Integer numWinMusic, Integer numLoseMusic, Integer numWinGeography, Integer numLoseGeography, Integer numWinEnglish, Integer numLoseEnglish, Integer numWinCommonsense, Integer numLoseCommonsense, String deviceToken) {
@@ -80,6 +82,7 @@ public class User implements Serializable {
         this.numWinCommonsense = numWinCommonsense;
         this.numLoseCommonsense = numLoseCommonsense;
         this.deviceToken = deviceToken;
+        setRankByScore();
     }
 
     public Integer getId() {
@@ -264,6 +267,29 @@ public class User implements Serializable {
 
     public void setDeviceToken(String deviceToken) {
         this.deviceToken = deviceToken;
+    }
+
+    public String getRank() {
+        return rank;
+    }
+
+    public void setRank(String rank) {
+        this.rank = rank;
+    }
+
+    public String setRankByScore(){
+        if(score < 1) {
+            return "pawn";
+        }else if(score < 5){
+            return "knight";
+        }else if(score < 10){
+            return "bishop";
+        }else if(score < 15){
+            return "tower";
+        }else if(score > 25){
+            return "queen";
+        }
+        return null;
     }
 
     public String toJSON() {
