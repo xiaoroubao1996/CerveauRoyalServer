@@ -1,5 +1,6 @@
 package SMA;
 
+import Model.Constant;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
@@ -7,15 +8,13 @@ import jade.lang.acl.MessageTemplate;
 
 public class ProcessBehaviour extends Behaviour {
 	String content;
-	String receiverName;
 	MessageTemplate mt;
 	private boolean stop = false;
 	int step = 0;
 	public String answer;
 
-	public ProcessBehaviour(String receiverName, String content) {
+	public ProcessBehaviour(String content) {
 		super();
-		this.receiverName = receiverName;
 		this.content = content;
 	}
 
@@ -28,7 +27,7 @@ public class ProcessBehaviour extends Behaviour {
 			String convId = String.valueOf(System.currentTimeMillis());
 			mt = MessageTemplate.MatchConversationId(convId);
 			message.setConversationId(convId);
-			message.addReceiver(new AID(receiverName, AID.ISLOCALNAME));
+			message.addReceiver(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME));
 			myAgent.send(message);
 			step = 1;
 			break;

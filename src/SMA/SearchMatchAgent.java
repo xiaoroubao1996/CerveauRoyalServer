@@ -1,5 +1,6 @@
 package SMA;
 
+import Model.Constant;
 import Model.JadeModel;
 import Model.User;
 import SMA.MatchAgent;
@@ -24,7 +25,7 @@ public class SearchMatchAgent extends Agent {
 
     protected void setup() {
         System.out.println(getLocalName()+ "--> Installed");
-        DF.registerAgent(this,"Searching", getLocalName());
+        DF.registerAgent(this, Constant.SEARCH_MATCH_NAME, getLocalName());
         user1 = null;
         subject = "";
     }

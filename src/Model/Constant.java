@@ -14,7 +14,9 @@ public class Constant {
 
 
     //String
-    public static final String ENVIRONEMENT_NAME = "environement";
+    public static final String JADEGATEWAY_NAME = "ControlContainer-1@cearveauroyal";
+    public static final String ENVIRONEMENT_NAME = "environementAgent";
+    public static final String SEARCH_MATCH_NAME = "searchMatchAgent";
 
 
 

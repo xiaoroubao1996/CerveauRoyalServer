@@ -23,15 +23,27 @@ public class SMAServlet  extends HttpServlet {
             throws ServletException, IOException {
         // TODO Auto-generated method stub
 //		super.doDelete(req, resp);
-        System.out.println("处理Get请求。。。");
-        response.setContentType("text/html;charset=utf-8");
+        String url = request.getRequestURI();
+        int lastIndex = url.lastIndexOf("/");
+        String urlREST = url.substring(lastIndex + 1);
         PrintWriter out = response.getWriter();
+        switch(urlREST){
+            case("user"):
+                ProcessBehaviour behaviour = new ProcessBehaviour("tset");
+                activeAgent(behaviour);
+                out.println(behaviour.answer);
+                break;
+        }
 
-        ProcessBehaviour behaviour = new ProcessBehaviour("testAgent", "this is content");
-        activeAgent(behaviour);
+//        System.out.println("处理Get请求。。。");
+//        response.setContentType("text/html;charset=utf-8");
+//        PrintWriter out = response.getWriter();
+//
+//        ProcessBehaviour behaviour = new ProcessBehaviour("testAgent", "this is content");
+//        activeAgent(behaviour);
+//
+//        out.println(behaviour.answer);
 
-        out.println(behaviour.answer);
-        out.println("<strong>Hello servlet</strong>");
         out.flush();
         out.close();
     }
