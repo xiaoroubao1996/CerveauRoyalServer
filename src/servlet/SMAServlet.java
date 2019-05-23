@@ -1,5 +1,6 @@
 package servlet;
 
+import Model.Constant;
 import SMA.ProcessBehaviour;
 import jade.core.behaviours.Behaviour;
 import jade.wrapper.gateway.JadeGateway;
@@ -26,12 +27,15 @@ public class SMAServlet  extends HttpServlet {
         String url = request.getRequestURI();
         int lastIndex = url.lastIndexOf("/");
         String urlREST = url.substring(lastIndex + 1);
+        response.setContentType("text/html;charset=utf-8");
         PrintWriter out = response.getWriter();
         switch(urlREST){
             case("user"):
-                ProcessBehaviour behaviour = new ProcessBehaviour("tset");
+                System.out.println("get /user request");
+                ProcessBehaviour behaviour = new ProcessBehaviour("test", Constant.USER_INFO_NAME, Constant.SMA_GET);
                 activeAgent(behaviour);
                 out.println(behaviour.answer);
+                out.println("");
                 break;
         }
 

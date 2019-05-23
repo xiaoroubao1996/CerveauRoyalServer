@@ -37,22 +37,24 @@ public class UserInfoAgent extends Agent {
                 ObjectMapper mapper = new ObjectMapper();
                 switch(message.getPerformative()){
                     case ACLMessage.REQUEST:
+                        System.out.println("user : get message from env");
                         content = message.getContent();
                         System.out.println(myAgent.getLocalName() + "--> getRequest ");
 
-                        try {
-                            JsonNode rootNode = mapper.readTree(content); // read Json
-                            String email = rootNode.path("email").asText();
-
-                            //get user by id
-                            user = DAOFactory.getUserDAO().selectByEmail(email);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+//                        try {
+//                            JsonNode rootNode = mapper.readTree(content); // read Json
+//                            String email = rootNode.path("email").asText();
+//
+//                            //get user by id
+//                            user = DAOFactory.getUserDAO().selectByEmail(email);
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
 
                         //create reply
                         reply = message.createReply();
-                        reply.setContent(user.toJSON());
+//                        reply.setContent(user.toJSON());
+                        reply.setContent(message.getContent());
                         send(reply);
                         break;
 

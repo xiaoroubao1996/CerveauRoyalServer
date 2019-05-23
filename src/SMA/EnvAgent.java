@@ -1,6 +1,7 @@
 package SMA;
 
 import Model.Constant;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
@@ -10,6 +11,7 @@ import jade.wrapper.gateway.JadeGateway;
 
 public class EnvAgent extends Agent{
 	protected void setup() {
+        System.out.println(getLocalName()+ "--> Installed");
         DF.registerAgent(this, Constant.ENVIRONEMENT_NAME, getLocalName());
         addBehaviour(new EnvBehaviour());
 	}
@@ -23,7 +25,7 @@ public class EnvAgent extends Agent{
     private class EnvBehaviour extends CyclicBehaviour {
         private int step = 0;
         MessageTemplate mt;
-        ACLMessage message;
+        ACLMessage messageFromGateway;
         @Override
         public void action() {
 //            switch (step) {
@@ -44,10 +46,15 @@ public class EnvAgent extends Agent{
 //                        block();
 //                    break;
 //            }
-                message = receive();
-                if(message != null){
+            ACLMessage message = receive();
+            if(message != null){
+                // TODO
+                System.out.println("env: get message");
+                System.out.println(message.getSender().getName());
                 if (message.getSender().getName().equals(Constant.JADEGATEWAY_NAME)) {
                     //get message from gateway
+                    messageFromGateway = message;
+                    System.out.println("env: get message from gate way");
                     ACLMessage messageToSMA = message.createReply();
                     messageToSMA.setPerformative(message.getPerformative());
                     messageToSMA.setContent(message.getContent());
@@ -55,12 +62,14 @@ public class EnvAgent extends Agent{
                     send(messageToSMA);
                 }else{
                     //get message from SMA
+                    System.out.println("get message from user info");
                     message.clearAllReceiver();
-                    message.addReceiver();
+                    message.addReceiver(messageFromGateway.getSender()); // TODO
+                    send(message);
                 }
             }else{
                     block();
-            }
+                }
         }
     }
 

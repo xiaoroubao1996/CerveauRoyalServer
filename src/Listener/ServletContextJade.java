@@ -1,5 +1,6 @@
 package Listener;
 
+import Model.Constant;
 import Model.JadeModel;
 import jade.wrapper.AgentContainer;
 import jade.core.ProfileImpl;
@@ -27,7 +28,9 @@ public class ServletContextJade implements ServletContextListener {
                          jadeModel.setContainer(rt.createMainContainer(jadeModel.getProfileImpl()));
 
                          //put container to search agent
-                         jadeModel.getContainer().createNewAgent("searchMatchAgent", "SMA.searchMatchAgent",null).start();
+                         jadeModel.getContainer().createNewAgent(Constant.SEARCH_MATCH_NAME, "SMA.SearchMatchAgent",null).start();
+                         jadeModel.getContainer().createNewAgent(Constant.ENVIRONEMENT_NAME, "SMA.EnvAgent",null).start();
+                         jadeModel.getContainer().createNewAgent(Constant.USER_INFO_NAME, "SMA.UserInfoAgent",null).start();
                          System.out.println("Jade initialized");
                      } catch (Exception ex) {
                          ex.printStackTrace();

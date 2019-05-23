@@ -25,44 +25,44 @@ public class HelloServlet extends HttpServlet {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-//		super.doDelete(req, resp);
-		System.out.println("处理Get请求。。。");
-		response.setContentType("text/html;charset=utf-8");
-		PrintWriter out = response.getWriter();
-
-		ProcessBehaviour behaviour = new ProcessBehaviour("testAgent", "this is content");
-		activeAgent(behaviour);
-
-		out.println(behaviour.answer);
-		out.println("<strong>Hello servlet</strong>");
-		out.flush();
-		out.close();
-	}
-
-	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-//		super.doGet(request, response);
-		System.out.println("处理Post请求。。。");
-		response.setContentType("text/html;charset=utf-8");
-		PrintWriter out = response.getWriter();
-		
-		out.println("<strong>Hello servlet</strong>");
-		out.flush();
-		out.close();
-	}
-
-	private void activeAgent(Behaviour behaviour) {
-		try {
-			JadeGateway.execute(behaviour);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+//	@Override
+//	public void doGet(HttpServletRequest request, HttpServletResponse response)
+//			throws ServletException, IOException {
+//		// TODO Auto-generated method stub
+////		super.doDelete(req, resp);
+//		System.out.println("处理Get请求。。。");
+//		response.setContentType("text/html;charset=utf-8");
+//		PrintWriter out = response.getWriter();
+//
+//		ProcessBehaviour behaviour = new ProcessBehaviour("testAgent", "this is content");
+//		activeAgent(behaviour);
+//
+//		out.println(behaviour.answer);
+//		out.println("<strong>Hello servlet</strong>");
+//		out.flush();
+//		out.close();
+//	}
+//
+//	@Override
+//	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+//			throws ServletException, IOException {
+//		// TODO Auto-generated method stub
+////		super.doGet(request, response);
+//		System.out.println("处理Post请求。。。");
+//		response.setContentType("text/html;charset=utf-8");
+//		PrintWriter out = response.getWriter();
+//
+//		out.println("<strong>Hello servlet</strong>");
+//		out.flush();
+//		out.close();
+//	}
+//
+//	private void activeAgent(Behaviour behaviour) {
+//		try {
+//			JadeGateway.execute(behaviour);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 }
