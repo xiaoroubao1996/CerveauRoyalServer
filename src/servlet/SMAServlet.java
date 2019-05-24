@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
+import java.util.logging.Logger;
 
 public class SMAServlet  extends HttpServlet {
 
@@ -25,6 +27,15 @@ public class SMAServlet  extends HttpServlet {
         // TODO Auto-generated method stub
 //		super.doDelete(req, resp);
         String url = request.getRequestURI();
+
+        String JSON = request.getParameter("JSON");
+
+        Logger logger = Logger.getLogger(SMAServlet.class.getName());
+        logger.warning(url);
+        logger.warning("This is a warning!");
+        logger.warning(JSON);
+
+
         int lastIndex = url.lastIndexOf("/");
         String urlREST = url.substring(lastIndex + 1);
         response.setContentType("text/html;charset=utf-8");
@@ -32,10 +43,10 @@ public class SMAServlet  extends HttpServlet {
         switch(urlREST){
             case("user"):
                 System.out.println("get /user request");
-                ProcessBehaviour behaviour = new ProcessBehaviour("test", Constant.USER_INFO_NAME, Constant.SMA_GET);
+                ProcessBehaviour behaviour = new ProcessBehaviour(JSON, Constant.USER_INFO_NAME, Constant.SMA_GET);
+
                 activeAgent(behaviour);
                 out.println(behaviour.answer);
-                out.println("");
                 break;
         }
 
@@ -64,7 +75,7 @@ public class SMAServlet  extends HttpServlet {
 
         switch (urlREST){
             case("user"):
-                System.out.println("处理Get请求。。。");
+                System.out.println("处理Post请求。。。");
 //                response.setContentType("text/html;charset=utf-8");
 
                 out.println("<strong>Hello servlet</strong>");

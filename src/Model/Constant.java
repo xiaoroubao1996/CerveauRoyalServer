@@ -18,7 +18,7 @@ public class Constant {
     public static final String ENVIRONEMENT_NAME = "environementAgent";
     public static final String SEARCH_MATCH_NAME = "searchMatchAgent";
     public static final String USER_INFO_NAME = "userInfoAgent";
-
+    public static final String QUESTION_NAME = "questionAgent";
 
 
     //Integer
