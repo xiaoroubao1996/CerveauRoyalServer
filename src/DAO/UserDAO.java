@@ -159,7 +159,7 @@ public class UserDAO {
     }
 
     
-    public void add(User user) {
+    public void add(User user) throws SQLException {
         Connection conn = null;
         PreparedStatement sqlPrepare;
         try {
@@ -179,7 +179,7 @@ public class UserDAO {
 
             conn.close();
         } catch (SQLException se) {
-            se.printStackTrace();
+            throw se;
         } catch (Exception e) {
             e.printStackTrace();
         }

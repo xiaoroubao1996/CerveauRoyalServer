@@ -26,5 +26,6 @@ public class Constant {
     public static final int SMA_GET = 1;
     public static final int SMA_POST = 2;
     public static final int SMA_PUT = 3;
+    public static final int SMA_SUBSCRIBE = 4;
 
 }

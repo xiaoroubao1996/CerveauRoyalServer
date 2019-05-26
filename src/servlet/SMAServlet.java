@@ -40,11 +40,16 @@ public class SMAServlet  extends HttpServlet {
         String urlREST = url.substring(lastIndex + 1);
         response.setContentType("text/html;charset=utf-8");
         PrintWriter out = response.getWriter();
+        ProcessBehaviour behaviour = null;
         switch(urlREST){
             case("user"):
-                System.out.println("get /user request");
-                ProcessBehaviour behaviour = new ProcessBehaviour(JSON, Constant.USER_INFO_NAME, Constant.SMA_GET);
+                behaviour = new ProcessBehaviour(JSON, Constant.USER_INFO_NAME, Constant.SMA_GET);
+                activeAgent(behaviour);
+                out.println(behaviour.answer);
+                break;
 
+            case("login"):
+                behaviour = new ProcessBehaviour(JSON, Constant.USER_INFO_NAME, Constant.SMA_SUBSCRIBE);
                 activeAgent(behaviour);
                 out.println(behaviour.answer);
                 break;
@@ -67,20 +72,33 @@ public class SMAServlet  extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // TODO Auto-generated method stub
-//		super.doGet(request, response);
+//		super.doDelete(req, resp);
         String url = request.getRequestURI();
+
+        String JSON = request.getParameter("JSON");
+
         int lastIndex = url.lastIndexOf("/");
         String urlREST = url.substring(lastIndex + 1);
+        response.setContentType("text/html;charset=utf-8");
         PrintWriter out = response.getWriter();
-
-        switch (urlREST){
+        ProcessBehaviour behaviour = null;
+        switch(urlREST){
             case("user"):
-                System.out.println("处理Post请求。。。");
-//                response.setContentType("text/html;charset=utf-8");
-
-                out.println("<strong>Hello servlet</strong>");
+                behaviour = new ProcessBehaviour(JSON, Constant.USER_INFO_NAME, Constant.SMA_POST);
+                activeAgent(behaviour);
+                out.println(behaviour.answer);
                 break;
+
         }
+
+//        System.out.println("处理Get请求。。。");
+//        response.setContentType("text/html;charset=utf-8");
+//        PrintWriter out = response.getWriter();
+//
+//        ProcessBehaviour behaviour = new ProcessBehaviour("testAgent", "this is content");
+//        activeAgent(behaviour);
+//
+//        out.println(behaviour.answer);
 
         out.flush();
         out.close();

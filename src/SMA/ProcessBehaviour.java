@@ -26,6 +26,8 @@ public class ProcessBehaviour extends Behaviour {
 			this.ACLmessagePerformative = ACLMessage.PROPOSE;
 		} else if (ACLmessagePerformative == Constant.SMA_PUT){
 			this.ACLmessagePerformative = ACLMessage.INFORM;
+		}else if (ACLmessagePerformative == Constant.SMA_SUBSCRIBE){
+			this.ACLmessagePerformative = ACLMessage.SUBSCRIBE;
 		}
 	}
 
