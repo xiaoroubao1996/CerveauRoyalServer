@@ -30,10 +30,10 @@ public class SMAServlet  extends HttpServlet {
 
         String JSON = request.getParameter("JSON");
 
-        Logger logger = Logger.getLogger(SMAServlet.class.getName());
-        logger.warning(url);
-        logger.warning("This is a warning!");
-        logger.warning(JSON);
+//        Logger logger = Logger.getLogger(SMAServlet.class.getName());
+//        logger.warning(url);
+//        logger.warning("This is a warning!");
+//        logger.warning(JSON);
 
 
         int lastIndex = url.lastIndexOf("/");

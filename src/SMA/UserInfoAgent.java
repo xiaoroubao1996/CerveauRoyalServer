@@ -42,29 +42,36 @@ public class UserInfoAgent extends Agent {
                     case ACLMessage.REQUEST:
                         System.out.println("user : get message from env");
                         content = message.getContent();
-                        System.out.println(myAgent.getLocalName() + "--> getRequest ");
+                        System.out.println(myAgent.getLocalName() + "--> getRequest");
 
                         try {
                             JsonNode rootNode = mapper.readTree(content); // read Json
                             String email = rootNode.path("email").asText();
                             String password = rootNode.path("password").asText();
+                            String deviceToken = rootNode.path("password").asText();
                             //get user by id
                             user = DAOFactory.getUserDAO().selectByEmail(email);
+                            reply = message.createReply();
                             if(user.getPassword().equals(password)){
-                                reply = message.createReply();
                                 map.put("user",user.toJSON());
-                                map.put("isLogin", true);
+                                map.put("success", true);
+                                String jsonStr = mapper.writeValueAsString(map);
+                                reply.setContent(jsonStr);
+
+                                //update user's token
+                                user.setDeviceToken(deviceToken);
+                                DAOFactory.getUserDAO().update(user);
+                            }else{
+                                map.put("success", false);
                                 String jsonStr = mapper.writeValueAsString(map);
                                 reply.setContent(jsonStr);
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
+                            reply = message.createReply();
+                            String jsonStr = "{\"success\" : false }";
+                            reply.setContent(jsonStr);
                         }
-
-                        //create reply
-//                        reply = message.createReply();
-//                        reply.setContent(user.toJSON());
-//                        reply.setContent(message.getContent());
                         send(reply);
                         break;
 
