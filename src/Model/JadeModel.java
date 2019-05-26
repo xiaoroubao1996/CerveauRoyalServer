@@ -10,7 +10,7 @@ public class JadeModel {
     public JadeModel(){
         profileImpl = new ProfileImpl();
         profileImpl.setParameter("main", "true");
-        profileImpl.setParameter("gui", "false");
+        profileImpl.setParameter("gui", "true");
         profileImpl.setParameter("platform-id", "cerveauroyal");
         profileImpl.setParameter("local-port", "1098");
     }
