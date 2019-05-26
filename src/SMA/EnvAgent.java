@@ -9,6 +9,8 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.wrapper.gateway.JadeGateway;
 
+import java.sql.SQLOutput;
+
 public class EnvAgent extends Agent{
 	protected void setup() {
         System.out.println(getLocalName()+ "--> Installed");
@@ -49,8 +51,7 @@ public class EnvAgent extends Agent{
             ACLMessage message = receive();
             if(message != null){
                 // TODO
-                System.out.println("env: get message");
-                System.out.println(message.getSender().getName());
+                System.out.println(getLocalName() + " received message from someone");
                 if (message.getSender().getName().equals(Constant.JADEGATEWAY_NAME)) {
                     //get message from gateway
                     messageFromGateway = message;
