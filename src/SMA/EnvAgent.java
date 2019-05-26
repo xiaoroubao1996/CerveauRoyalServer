@@ -63,7 +63,7 @@ public class EnvAgent extends Agent{
                     send(messageToSMA);
                 }else{
                     //get message from SMA
-                    System.out.println("get message from user info");
+                    System.out.println(messageFromGateway.getContent());
                     message.clearAllReceiver();
                     message.addReceiver(messageFromGateway.getSender()); // TODO
                     send(message);
