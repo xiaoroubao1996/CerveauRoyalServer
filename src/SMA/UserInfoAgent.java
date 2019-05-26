@@ -11,6 +11,8 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class UserInfoAgent extends Agent {
     protected void setup() {
@@ -35,26 +37,34 @@ public class UserInfoAgent extends Agent {
                 String content = null;
                 User user = null;
                 ObjectMapper mapper = new ObjectMapper();
+                Map<String, Object> map = new HashMap<String, Object>();
                 switch(message.getPerformative()){
                     case ACLMessage.REQUEST:
                         System.out.println("user : get message from env");
                         content = message.getContent();
                         System.out.println(myAgent.getLocalName() + "--> getRequest ");
 
-//                        try {
-//                            JsonNode rootNode = mapper.readTree(content); // read Json
-//                            String email = rootNode.path("email").asText();
-//
-//                            //get user by id
-//                            user = DAOFactory.getUserDAO().selectByEmail(email);
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
+                        try {
+                            JsonNode rootNode = mapper.readTree(content); // read Json
+                            String email = rootNode.path("email").asText();
+                            String password = rootNode.path("password").asText();
+                            //get user by id
+                            user = DAOFactory.getUserDAO().selectByEmail(email);
+                            if(user.getPassword().equals(password)){
+                                reply = message.createReply();
+                                map.put("user",user.toJSON());
+                                map.put("isLogin", true);
+                                String jsonStr = mapper.writeValueAsString(map);
+                                reply.setContent(jsonStr);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
 
                         //create reply
-                        reply = message.createReply();
+//                        reply = message.createReply();
 //                        reply.setContent(user.toJSON());
-                        reply.setContent(message.getContent());
+//                        reply.setContent(message.getContent());
                         send(reply);
                         break;
 
