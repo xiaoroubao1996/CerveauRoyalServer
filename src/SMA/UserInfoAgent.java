@@ -51,7 +51,7 @@ public class UserInfoAgent extends Agent {
                             //get user by email
                             user = DAOFactory.getUserDAO().selectByEmail(email);
                             reply = message.createReply();
-                            if(user.getPassword().equals(password)){
+                            if(user != null && user.getPassword().equals(password)){
                                 map.put("success", true);
                                 String jsonStr = mapper.writeValueAsString(map);
                                 reply.setContent(jsonStr);

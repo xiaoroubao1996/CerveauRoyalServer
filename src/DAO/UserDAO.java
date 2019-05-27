@@ -224,8 +224,9 @@ public class UserDAO {
             sqlPrepare.setInt(20,user.getNumLoseCommonsense());
             sqlPrepare.setInt(21,user.getNumWinEnglish());
             sqlPrepare.setString(22,user.getDeviceToken());
-            sqlPrepare.setInt(23,user.getId());
-            sqlPrepare.setString(22,String.valueOf(user.getRank()));
+            sqlPrepare.setString(23,String.valueOf(user.getRank()));
+            sqlPrepare.setInt(24,user.getId());
+
             sqlPrepare.executeUpdate();
 
 
