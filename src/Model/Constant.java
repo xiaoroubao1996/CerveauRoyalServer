@@ -12,6 +12,14 @@ public class Constant {
         MUSIC
     }
 
+    public enum RANK {
+        PAWN,
+        KNIGHT,
+        BISHOP,
+        TOWER,
+        QUEEN
+    }
+
 
     //String
     public static final String JADEGATEWAY_NAME = "ControlContainer-1@cerveauroyal";

@@ -45,7 +45,8 @@ public class UserDAO {
                         result.getInt("numLoseEnglish"),
                         result.getInt("numWinCommonsense"),
                         result.getInt("numLoseCommonsense"),
-                        result.getString("deviceToken")
+                        result.getString("deviceToken"),
+                        result.getString("rank")
                 );
             }
             conn.close();
@@ -94,7 +95,8 @@ public class UserDAO {
                         result.getInt("numLoseEnglish"),
                         result.getInt("numWinCommonsense"),
                         result.getInt("numLoseCommonsense"),
-                        result.getString("deviceToken")
+                        result.getString("deviceToken"),
+                        result.getString("rank")
                 );
             }
             conn.close();
@@ -142,7 +144,8 @@ public class UserDAO {
                         result.getInt("numLoseEnglish"),
                         result.getInt("numWinCommonsense"),
                         result.getInt("numLoseCommonsense"),
-                        result.getString("deviceToken")
+                        result.getString("deviceToken"),
+                        result.getString("rank")
                 );
 
                 resultList.add(user);
@@ -196,7 +199,7 @@ public class UserDAO {
             sql = "UPDATE User SET nickname= ?, email= ?, password= ?, avatar= ?, score = ?, "
                     + "numWinLiterature = ? , numLoseLiterature = ?, numWinMath = ?, numLoseMath = ?, numWinArt = ?, numLoseArt = ?, numWinHistory = ?, numLoseHistory = ?,"
                     + "numWinMusic = ?, numLoseMusic = ?, numWinGeography = ?, numLoseGeography = ?, numWinEnglish = ?, numLoseEnglish = ?, numWinCommonsense = ?, numLoseCommonsense = ?,"
-                    + "deviceToken = ? WHERE id = ?";
+                    + "deviceToken = ?, rank = ? WHERE id = ?";
 
             sqlPrepare=conn.prepareStatement(sql);
             sqlPrepare.setString(1,user.getnickname());
@@ -222,6 +225,7 @@ public class UserDAO {
             sqlPrepare.setInt(21,user.getNumWinEnglish());
             sqlPrepare.setString(22,user.getDeviceToken());
             sqlPrepare.setInt(23,user.getId());
+            sqlPrepare.setString(22,String.valueOf(user.getRank()));
             sqlPrepare.executeUpdate();
 
 
