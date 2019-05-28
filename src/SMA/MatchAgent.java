@@ -36,6 +36,9 @@ public class MatchAgent extends Agent {
 	protected void setup() {
 		System.out.println(getLocalName() + "--> Installed");
 
+		user1Score = 0;
+        user2Score = 0;
+
 		Object[] objects = getArguments();
 		Map map = (Map) objects[0];
 
@@ -146,28 +149,30 @@ public class MatchAgent extends Agent {
 
 		int iterator = 0 ;
 		int step = 0;
-		long endTime = System.currentTimeMillis() + 15000;
-		int user1Res;
-		int user2Res;
+		long endTime = System.currentTimeMillis() + 20000;
+		int user1Res = 0;
+		int user2Res = 0;
 		int correctRes;
 		String msgJson;
+        ACLMessage message1;
+        ACLMessage message2;
 
 		@Override
 		public void action() {
 			switch(step) {
-			case'0':
+			case 0:
 				//waiting for the reply from both users
 				//15 s for each question
 				while(endTime > System.currentTimeMillis()) {
 					correctRes = questionsList.get(iterator).getAnswer();
 					//TODO: doubleCheck the sender and performative
 					MessageTemplate mt1 = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
-							MessageTemplate.MatchSender(new AID("EnvAgent", AID.ISLOCALNAME)));
-					ACLMessage message1 = receive(mt1);
+							MessageTemplate.MatchSender(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME)));
+					message1 = receive(mt1);
 
 					MessageTemplate mt2 = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
-							MessageTemplate.MatchSender(new AID("EnvAgent", AID.ISLOCALNAME)));
-					ACLMessage message2 = receive(mt2);
+							MessageTemplate.MatchSender(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME)));
+					message2 = receive(mt2);
 
 					if (message1 != null && message2 != null) {
 						msgJson = message1.getContent();
@@ -175,18 +180,20 @@ public class MatchAgent extends Agent {
 
 						msgJson = message2.getContent();
 						checkMsg(msgJson);
-
 						step++;
+						break;
 					} else {
 						block();
 					}
 				}
 				break;
-			case'1':
+			case 1:
 				//return the option chosen by another user as well as the score of another user
 				//{"msgTo":"id", "opponent": "id","score":"x", "choice": "x"}
-				ACLMessage m = new ACLMessage(ACLMessage.INFORM);
-				m.addReceiver(new AID("EnvAgent", AID.ISLOCALNAME));
+
+                ACLMessage m = message1.
+                        new ACLMessage(ACLMessage.INFORM);
+				m.addReceiver(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME));
 				m.setContent("{\"msgTo\":\""+user2.getId()+
 						"\", \"opponent\": \""+user1.getId()+"\",\"score\":\""+user1Score+"\", \"choice\": \""+user1Res+"\"}");
 				myAgent.send(m);
@@ -198,6 +205,12 @@ public class MatchAgent extends Agent {
 				myAgent.send(m);
 
 				iterator++;
+                user1Res = 0;
+                user2Res = 0;
+                message1 = null;
+                message2 = null;
+                endTime = System.currentTimeMillis() + 20000;
+                step = 0;
 				break;
 			}
 
@@ -286,13 +299,14 @@ public class MatchAgent extends Agent {
 		@Override
 		public void action() {
 			// reply to the Env "we get user2 and we get Data, ready to go"
-			// TODO: in SearchMatchAgent set this message replyTo EnvAgent
 //			reply.setContent(generateReplyJson(String.valueOf(user1.getId()), String.valueOf(user2.getId()), questionsJson));
 //			send(reply);
             // the JadeMsg from EnvAgent -> SearchMatchAgent -> MatchAgent
-            MessageToReplyUser1.setContent();
+            MessageToReplyUser1.setContent(generateReplyJson(user1, user2));
+            MessageToReplyUser2.setContent(generateReplyJson(user2, user1));
 
-            //set content
+            send(MessageToReplyUser1);
+            send(MessageToReplyUser2);
 		}
 
 
@@ -358,6 +372,9 @@ public class MatchAgent extends Agent {
 		@Override
 		protected void onWake() {
 			System.out.println(myAgent.getLocalName() + "--> wake up");
+            String jsonString = "{\"success\": false}";
+            MessageToReplyUser1.setContent(jsonString);
+            send(MessageToReplyUser1);
 			myAgent.doDelete();
 		}
 	}
