@@ -99,8 +99,13 @@ public class SearchMatchAgent extends Agent {
             ACLMessage message = new ACLMessage(ACLMessage.SUBSCRIBE);
             message.addReceiver(matchAID);
             message.setContent(user1.toJSON());
+            //add replyTo so the message to Match reply directly to Env (escape SearchMatchAgent)
+            message.addReplyTo(new AID(Constant.ENVIRONEMENT_NAME,AID.ISLOCALNAME));
             message.setConversationId(ACLMessageFromEnv.getConversationId());
             send(message);
+            //remove the agent
+            DF.removeAgents(myAgent, matchAID);
+            
         }
     }
 
