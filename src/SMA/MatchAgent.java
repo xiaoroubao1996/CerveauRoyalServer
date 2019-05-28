@@ -241,7 +241,7 @@ public class MatchAgent extends Agent {
 		@Override
 		public void action() {
 			switch (step) {
-			case '0':
+			case 0:
 				// send request to QuestionDataAgent
 				// request 10 questions in one time
 				ACLMessage m = new ACLMessage(ACLMessage.REQUEST);
@@ -251,7 +251,7 @@ public class MatchAgent extends Agent {
 				myAgent.send(m);
 				step = 1;
 				break;
-			case '1':
+			case 1:
 				MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST),
 						MessageTemplate.MatchSender(new AID("questionDataAgent", AID.ISLOCALNAME)));
 				ACLMessage message = receive(mt);
