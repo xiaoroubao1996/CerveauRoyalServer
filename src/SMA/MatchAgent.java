@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import DAO.DAOFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -295,22 +296,23 @@ public class MatchAgent extends Agent {
 		}
 
 
-		private String generateReplyJson(User opponent) {
+		private String generateReplyJson(User userSelf, User opponent) {
 			Map<String, Object> map = new HashMap<>();
 
             ObjectMapper mapper = new ObjectMapper();
+
+            String jsonString = null;
             try {
                 String questionsJSON = mapper.writeValueAsString(questionsList);
                 map.put("success",true);
                 map.put("opponent", opponent.toJSON());
                 map.put("questions",questionsJSON);
                 map.put("matchId", matchId);
-                map.put("withFriend",withFriend);
+                map.put("withFriend", DAOFactory.getFriendDAO().user1IsFriendOfUser2(userSelf, opponent));
+                jsonString = mapper.writeValueAsString(map);
             } catch (JsonProcessingException e) {
-                map.put("success",false);
+                jsonString = "{\"success\": false}";
             }
-
-            jsonString = "{\"opponent\":\"" + opponent.toJSON() + "\","+msgJson+"}";
 			return jsonString;
 		}
 
