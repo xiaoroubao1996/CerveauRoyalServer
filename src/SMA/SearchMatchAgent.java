@@ -96,7 +96,7 @@ public class SearchMatchAgent extends Agent {
 
         @Override
         public void action() {
-            ACLMessage message = new ACLMessage(ACLMessage.PROPOSE); //TODO propose ?
+            ACLMessage message = new ACLMessage(ACLMessage.SUBSCRIBE);
             message.addReceiver(matchAID);
             message.setContent(user1.toJSON());
             message.setConversationId(ACLMessageFromEnv.getConversationId());
@@ -200,11 +200,13 @@ public class SearchMatchAgent extends Agent {
         public void action() {
            MatchAgent newMatch = new MatchAgent();
            try {
-               List<Object> params = new ArrayList<Object>();
-               params.add(subject);
-               params.add(user1);
-               params.add(ACLMessageFromEnv.getConversationId());
-               JadeModel.getContainer().createNewAgent(Constant.MATCH_NAME + String.valueOf(System.currentTimeMillis()), "SMA.MatchAgent",params.toArray()).start();
+               Object[] list = new Object[1];
+               Map<String, Object> params = new HashMap<>();
+               params.put("subject", subject);
+               params.put("user1", user1);
+               params.put("MessageToReplyUser1",ACLMessageFromEnv);
+               list[0] = params;
+               JadeModel.getContainer().createNewAgent(Constant.MATCH_NAME + String.valueOf(System.currentTimeMillis()), "SMA.MatchAgent",list).start();
            } catch (StaleProxyException e) {
                e.printStackTrace();
            }
