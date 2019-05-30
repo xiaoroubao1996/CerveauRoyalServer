@@ -293,44 +293,44 @@ public class User implements Serializable {
         }
     }
 
-    public void updateMatchResult(boolean isWin, String subject){
+    public void updateMatchResult(boolean isWin, int subject){
         if(isWin){
             score = score + 10;
         }else{
             score = score - 10;
         }
-        if(isWin && subject == String.valueOf(Constant.SUBJECT.ART)){
-            numWinArt ++;
-        }else if(!isWin && subject == String.valueOf(Constant.SUBJECT.ART)){
-            numLoseArt ++;
-        }else if(isWin && subject == String.valueOf(Constant.SUBJECT.MUSIC)){
-            numWinMusic ++;
-        }else if(!isWin && subject == String.valueOf(Constant.SUBJECT.MUSIC)){
-            numLoseMusic ++;
-        }else if(isWin && subject == String.valueOf(Constant.SUBJECT.COMMONSENSE)){
-            numWinCommonsense ++;
-        }else if(!isWin && subject == String.valueOf(Constant.SUBJECT.COMMONSENSE)){
-            numLoseCommonsense ++;
-        }else if(isWin && subject == String.valueOf(Constant.SUBJECT.ENGLISH)){
-            numWinEnglish ++;
-        }else if(!isWin && subject == String.valueOf(Constant.SUBJECT.ENGLISH)){
-            numLoseEnglish ++;
-        }else if(isWin && subject == String.valueOf(Constant.SUBJECT.GEOGRAPHY)){
+        if(isWin && subject == 1){
             numWinGeography ++;
-        }else if(!isWin && subject == String.valueOf(Constant.SUBJECT.GEOGRAPHY)){
+        }else if(!isWin && subject == 1){
             numLoseGeography ++;
-        }else if(isWin && subject == String.valueOf(Constant.SUBJECT.HISTORY)){
-            numWinHistory ++;
-        }else if(!isWin && subject == String.valueOf(Constant.SUBJECT.HISTORY)){
-            numLoseHistory ++;
-        }else if(isWin && subject == String.valueOf(Constant.SUBJECT.LITERATURE)){
+        }else if(isWin && subject == 2){
             numWinLiterature ++;
-        }else if(!isWin && subject == String.valueOf(Constant.SUBJECT.LITERATURE)){
+        }else if(!isWin && subject == 2){
             numLoseLiterature ++;
-        }else if(isWin && subject == String.valueOf(Constant.SUBJECT.MATH)){
+        }else if(isWin && subject == 3){
             numWinMath ++;
-        }else if(!isWin && subject == String.valueOf(Constant.SUBJECT.MATH)){
+        }else if(!isWin && subject == 3){
             numLoseMath ++;
+        }else if(isWin && subject == 4){
+            numWinHistory ++;
+        }else if(!isWin && subject == 4){
+            numLoseHistory ++;
+        }else if(isWin && subject == 5){
+            numWinArt ++;
+        }else if(!isWin && subject == 5){
+            numLoseArt ++;
+        }else if(isWin && subject == 6){
+            numWinMusic ++;
+        }else if(!isWin && subject == 6){
+            numLoseMusic ++;
+        }else if(isWin && subject == 7){
+            numWinEnglish ++;
+        }else if(!isWin && subject == 7){
+            numLoseEnglish ++;
+        }else if(isWin && subject == 8){
+            numWinCommonsense ++;
+        }else if(!isWin && subject == 8){
+            numLoseCommonsense ++;
         }
         }
 

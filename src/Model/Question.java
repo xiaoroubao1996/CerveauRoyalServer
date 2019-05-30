@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 public class Question implements Serializable {
     private Integer id;
-    private Constant.SUBJECT subject;
+    private Integer subject;
     private String text;
     private String option1;
     private String option2;
@@ -18,9 +18,9 @@ public class Question implements Serializable {
 
     private Question(){}
 
-    public Question(Integer id, String subject, String text, String option1, String option2, String option3, String option4, Integer answer) {
+    public Question(Integer id, Integer subject, String text, String option1, String option2, String option3, String option4, Integer answer) {
         this.id = id;
-        this.subject = Constant.SUBJECT.valueOf(subject);
+        this.subject = subject;
         this.text = text;
         this.option1 = option1;
         this.option2 = option2;
@@ -38,12 +38,12 @@ public class Question implements Serializable {
         this.id = id;
     }
 
-    public Constant.SUBJECT getSubject() {
+    public Integer getSubject() {
         return subject;
     }
 
-    public void setSubject(String subject) {
-        this.subject = Constant.SUBJECT.valueOf(subject);
+    public void setSubject(Integer subject) {
+        this.subject = subject;
     }
 
     public String getText() {
