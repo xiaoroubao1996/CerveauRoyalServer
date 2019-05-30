@@ -28,7 +28,7 @@ public class MatchAgent extends Agent {
 	private User user2;
 	private int user1Score;
 	private int user2Score;
-	private int opponentId;
+	private Integer opponentId;
 	private Boolean withUser;
 	private String matchSubject;
 	private String matchId;
@@ -43,6 +43,7 @@ public class MatchAgent extends Agent {
 
 		user1Score = 0;
         user2Score = 0;
+        opponentId = 0 ;
 
 		Object[] objects = getArguments();
 		Map map = (Map) objects[0];
@@ -50,8 +51,7 @@ public class MatchAgent extends Agent {
 		matchSubject = (String) map.get("subject");
 		user1 = (User) map.get("user");
 		withUser = (Boolean) map.get("withUser");
-		opponentId = (int) map.get("userId");
-		//need to send FriendAgent subject userid and myid
+		opponentId = (Integer) map.get("userId");
 		
 		
         MessageToReplyUser1 = (ACLMessage) map.get("MessageToReplyUser1");
@@ -62,10 +62,6 @@ public class MatchAgent extends Agent {
 		DF.registerAgent(this, matchSubject, matchLevel);
         matchId = this.getName();
         
-        if(withUser == true) {
-        	addBehaviour(new CreatFriendAgentBehaviour());
-        }
-
 		// The main behaviour in this Agent
 		SequentialBehaviour MatchSequentialBehaviour = new SequentialBehaviour();
 
@@ -115,35 +111,23 @@ public class MatchAgent extends Agent {
 		addBehaviour(MatchSequentialBehaviour);
 	}
 	
-	
-	private class CreatFriendAgentBehaviour extends Behaviour{
 
-		@Override
-		public void action() {
-	           try {
-	               Object[] list = new Object[1];
-	               Map<String, Object> params = new HashMap<>();
-	               params.put("userId", user1.getId());
-	               params.put("subject", matchSubject);
-	               params.put("opponentId", opponentId);
-	               //new agent new + time
-//	               params.put("MessageToReplyUser1", ACLMessageFromEnv);
-	               list[0] = params;
-	               JadeModel.getContainer().createNewAgent(Constant.FRIEND_NAME + String.valueOf(System.currentTimeMillis()), "SMA.MatchAgent",list).start();
-	           } catch (StaleProxyException e) {
-	               e.printStackTrace();
-	           }
-	        }
-		
-		
-		
-		@Override
-		public boolean done() {
-			// TODO Auto-generated method stub
-			return false;
-		}
-	
-	}	
+
+	private String generateDataJson(User user, Boolean withUser, String userId) {
+		Map<String, Object> map = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonString = null;
+        try {
+            map.put("user",user.toJSON());
+            map.put("withUser", withUser);
+            map.put("userId", userId);
+            jsonString = mapper.writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+//            jsonString = "{\"success\": false}";
+        }
+		return jsonString;
+	}
+  
 	
 
 	private class GameOverBehaviour extends Behaviour{
@@ -412,13 +396,46 @@ public class MatchAgent extends Agent {
 			if (message != null) {
 				System.out.println(myAgent.getLocalName() + "--> getRequest ");
 
-				//reply
-                MessageToReplyUser2 = message.createReply();
+				if(withUser == true) {		
+					ObjectMapper mapper = new ObjectMapper();
+					JsonNode rootNode = null;
+					// read Json
+					try {
+						rootNode = mapper.readTree(message.getContent());
+						Boolean success = rootNode.path("success").asBoolean();
+						//case 1-1: play the game with an user and the user accept the request
+						if(success == true && opponentId != 0) {
+							//get the user2 into this room then goto get the questionDataBehaviour
+							user2 = DAOFactory.getUserDAO().selectByID(opponentId);
+							MessageToReplyUser2 = message.createReply();
+							
+						}else {
+						//case 1-2: play the game with an user and the user REFUSE the request
+							//tell the user1 that request FALSE and delete this room
+							String jsonString = "{\"success\": false}";
+				            MessageToReplyUser1.setContent(jsonString);
+				            send(MessageToReplyUser1);
+							myAgent.doDelete();
+						}
+						//case 2: play the game with an user but the user does NOT reply 
+						//deleteOutOfTimeBehaviour will be launched and end this MatchAgent
+						//if the Friend response the request after the delete of MatchAgent, 
+						//TODO: Android app need to treat the OnErruer state. 
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					
+					
+					
+				}else {
+					//reply
+	                MessageToReplyUser2 = message.createReply();
 
-				// Get user2 info and add into this room, content is a json of a user object
-                String userString = message.getContent();
-				user2 = User.read(userString);
-
+					// Get user2 info and add into this room, content is a json of a user object
+	                String userString = message.getContent();
+					user2 = User.read(userString);
+				}
+				
 				done = true;
 			} else
 				block();
