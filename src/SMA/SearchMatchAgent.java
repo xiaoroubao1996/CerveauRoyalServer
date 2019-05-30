@@ -67,10 +67,12 @@ public class SearchMatchAgent extends Agent {
                     id = rootNode.path("id").asInt();
                     subject = rootNode.path("subject").asText();
                     withUser = rootNode.path("withUser").asBoolean();
-                    userId = rootNode.path("userId").asInt();
-                    //get the user info
+                    if(withUser){
+                        userId = rootNode.path("userId").asInt();
+                        //get the user info
+                    }
                     user = DAOFactory.getUserDAO().selectByID(id);
-                } catch (IOException e) {
+                    } catch (IOException e) {
                     e.printStackTrace();
                 }
 //                might be useless

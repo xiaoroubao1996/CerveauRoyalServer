@@ -28,7 +28,7 @@ public class MatchAgent extends Agent {
 	private User user2;
 	private int user1Score;
 	private int user2Score;
-	private String opponentId;
+	private int opponentId;
 	private Boolean withUser;
 	private String matchSubject;
 	private String matchId;
@@ -47,10 +47,10 @@ public class MatchAgent extends Agent {
 		Object[] objects = getArguments();
 		Map map = (Map) objects[0];
 
-		matchSubject = (String) map.get("Subject");
+		matchSubject = (String) map.get("subject");
 		user1 = (User) map.get("user");
 		withUser = (Boolean) map.get("withUser");
-		opponentId = (String) map.get("userId");
+		opponentId = (int) map.get("userId");
 		//need to send FriendAgent subject userid and myid
 		
 		
@@ -327,7 +327,7 @@ public class MatchAgent extends Agent {
 				// request 10 questions in one time
 				ACLMessage m = new ACLMessage(ACLMessage.REQUEST);
 				// TODO: doubleCheck the AID of questionDataAgent
-				m.addReceiver(new AID("questionDataAgent", AID.ISLOCALNAME));
+				m.addReceiver(new AID(Constant.QUESTION_NAME, AID.ISLOCALNAME));
 				m.setContent("{\"Subjet\":\"" + matchSubject + "\"}");
 				myAgent.send(m);
 				step = 1;
