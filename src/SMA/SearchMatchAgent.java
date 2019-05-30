@@ -32,7 +32,7 @@ public class SearchMatchAgent extends Agent {
     private String subject;
     private ACLMessage ACLMessageFromEnv;
     private Boolean withUser;
-    private String userId;
+    private int userId;
     
 
     protected void setup() {
@@ -45,7 +45,7 @@ public class SearchMatchAgent extends Agent {
         subject = "";
         ACLMessageFromEnv = null;
         withUser = false;
-        userId = "";
+        userId = 0;
         
         addBehaviour(new waitMsgBehaviour());
     }
@@ -57,8 +57,7 @@ public class SearchMatchAgent extends Agent {
         public void action() {
             MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
             ACLMessage message = myAgent.receive(mt);
-
-            if (message != null && message.getSender().getName().equals(Constant.ENVIRONEMENT_NAME)) {
+            if (message != null) {
                 ACLMessageFromEnv = message;
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode rootNode = null; 
@@ -68,7 +67,7 @@ public class SearchMatchAgent extends Agent {
                     id = rootNode.path("id").asInt();
                     subject = rootNode.path("subject").asText();
                     withUser = rootNode.path("withUser").asBoolean();
-                    userId = rootNode.path("userId").asText();
+                    userId = rootNode.path("userId").asInt();
                     //get the user info
                     user = DAOFactory.getUserDAO().selectByID(id);
                 } catch (IOException e) {
@@ -80,7 +79,7 @@ public class SearchMatchAgent extends Agent {
                 
                 //if withFriend==true just need to create new agent. 
                 //and only in the case of newMatchBehaviour we need to send these two var to MatchAgent
-                if(withUser==true && userId.length() != 0) {
+                if(withUser==true && userId != 0) {
                 	 addBehaviour(new newMatchBehaviour());
                 }else { 
                 	//GET match
@@ -98,6 +97,8 @@ public class SearchMatchAgent extends Agent {
                 
                 
            
+            }else{
+                block();
             }
 
 
