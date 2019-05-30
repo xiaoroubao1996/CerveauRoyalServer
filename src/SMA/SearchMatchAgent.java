@@ -32,7 +32,7 @@ public class SearchMatchAgent extends Agent {
 	private String subject;
 	private ACLMessage ACLMessageFromEnv;
 	private Boolean withUser;
-	private int userId;
+	private Integer userId;
 	private String newMatchAID;
 
 	protected void setup() {
@@ -133,7 +133,6 @@ public class SearchMatchAgent extends Agent {
 		public boolean done() {
 			return true;
 		}
-
 	}
 
 	// send message other user to match to begin the game
@@ -250,20 +249,6 @@ public class SearchMatchAgent extends Agent {
 	// }
 	// }
 
-	// private String generateDataJson(User user, Boolean withUser, String userId) {
-	// Map<String, Object> map = new HashMap<>();
-	// ObjectMapper mapper = new ObjectMapper();
-	// String jsonString = null;
-	// try {
-	// map.put("user",user.toJSON());
-	// map.put("withUser", withUser);
-	// map.put("userId", userId);
-	// jsonString = mapper.writeValueAsString(map);
-	// } catch (JsonProcessingException e) {
-	//// jsonString = "{\"success\": false}";
-	// }
-	// return jsonString;
-	// }
 
 	// create a new match
 	private class newMatchBehaviour extends OneShotBehaviour {
