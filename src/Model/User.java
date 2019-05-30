@@ -293,6 +293,47 @@ public class User implements Serializable {
         }
     }
 
+    public void updateMatchResult(boolean isWin, String subject){
+        if(isWin){
+            score = score + 10;
+        }else{
+            score = score - 10;
+        }
+        if(isWin && subject == String.valueOf(Constant.SUBJECT.ART)){
+            numWinArt ++;
+        }else if(!isWin && subject == String.valueOf(Constant.SUBJECT.ART)){
+            numLoseArt ++;
+        }else if(isWin && subject == String.valueOf(Constant.SUBJECT.MUSIC)){
+            numWinMusic ++;
+        }else if(!isWin && subject == String.valueOf(Constant.SUBJECT.MUSIC)){
+            numLoseMusic ++;
+        }else if(isWin && subject == String.valueOf(Constant.SUBJECT.COMMONSENSE)){
+            numWinCommonsense ++;
+        }else if(!isWin && subject == String.valueOf(Constant.SUBJECT.COMMONSENSE)){
+            numLoseCommonsense ++;
+        }else if(isWin && subject == String.valueOf(Constant.SUBJECT.ENGLISH)){
+            numWinEnglish ++;
+        }else if(!isWin && subject == String.valueOf(Constant.SUBJECT.ENGLISH)){
+            numLoseEnglish ++;
+        }else if(isWin && subject == String.valueOf(Constant.SUBJECT.GEOGRAPHY)){
+            numWinGeography ++;
+        }else if(!isWin && subject == String.valueOf(Constant.SUBJECT.GEOGRAPHY)){
+            numLoseGeography ++;
+        }else if(isWin && subject == String.valueOf(Constant.SUBJECT.HISTORY)){
+            numWinHistory ++;
+        }else if(!isWin && subject == String.valueOf(Constant.SUBJECT.HISTORY)){
+            numLoseHistory ++;
+        }else if(isWin && subject == String.valueOf(Constant.SUBJECT.LITERATURE)){
+            numWinLiterature ++;
+        }else if(!isWin && subject == String.valueOf(Constant.SUBJECT.LITERATURE)){
+            numLoseLiterature ++;
+        }else if(isWin && subject == String.valueOf(Constant.SUBJECT.MATH)){
+            numWinMath ++;
+        }else if(!isWin && subject == String.valueOf(Constant.SUBJECT.MATH)){
+            numLoseMath ++;
+        }
+        }
+
     public String toJSON() {
         ObjectMapper mapper = new ObjectMapper();
         String s = "";

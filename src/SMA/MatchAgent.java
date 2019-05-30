@@ -32,6 +32,7 @@ public class MatchAgent extends Agent {
 	private String questionsJson;
 	private ACLMessage MessageToReplyUser1;
 	private ACLMessage MessageToReplyUser2;
+	private ObjectMapper mapper = new ObjectMapper();
 
 	protected void setup() {
 		System.out.println(getLocalName() + "--> Installed");
@@ -120,19 +121,20 @@ public class MatchAgent extends Agent {
 
 
 			//update the score of user 1 and user 2
-			//{userId:xx, subject:xxx,win:true}
+			//{user: user}
+
+			user1.updateMatchResult(user1Win,matchSubject);
+			user2.updateMatchResult(user2Win,matchSubject);
+
+
 			ACLMessage m = new ACLMessage(ACLMessage.INFORM);
-			m.addReceiver(new AID("UserInfoAgent", AID.ISLOCALNAME));
-			m.setContent("{\"userId\":\""+user1.getId()+
-					"\", \"subject\": \""+matchSubject+
-					"\",\"isWinner\":\""+user1Win+"\"}");
+			m.addReceiver(new AID(Constant.USER_INFO_NAME, AID.ISLOCALNAME));
+			m.setContent(user1.toJSON());
 			myAgent.send(m);
 
 			m = new ACLMessage(ACLMessage.INFORM);
-			m.addReceiver(new AID("UserInfoAgent", AID.ISLOCALNAME));
-			m.setContent("{\"userId\":\""+user2.getId()+
-					"\", \"subject\": \""+matchSubject+
-					"\",\"isWinner\":\""+user2Win+"\"}");
+			m.addReceiver(new AID(Constant.USER_INFO_NAME, AID.ISLOCALNAME));
+			m.setContent(user2.toJSON());
 			myAgent.send(m);
 
 			myAgent.doDelete();
@@ -190,6 +192,8 @@ public class MatchAgent extends Agent {
 					} else {
 						block();
 					}
+
+				//which means one of the users lose his connection
 				}else{
 					step++;
 					iterator = 10;
@@ -198,19 +202,31 @@ public class MatchAgent extends Agent {
 				break;
 			case 1:
 				//return the option chosen by another user as well as the score of another user
-				//{"msgTo":"id", "opponent": "id","score":"x", "choice": "x"}
+				//{"id":id,"matchId":matchId, "index": Index,"answer": answer. "score":score, "stop", stop}
 
-                ACLMessage m = message1.
-                        new ACLMessage(ACLMessage.INFORM);
+				//To user1
+                ACLMessage m = message1.createReply();
+                m.setPerformative(ACLMessage.INFORM);
 				m.addReceiver(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME));
-				m.setContent("{\"msgTo\":\""+user2.getId()+
-						"\", \"opponent\": \""+user1.getId()+"\",\"score\":\""+user1Score+"\", \"choice\": \""+user1Res+"\"}");
+
+				String newMessageContent = message2.getContent();
+				newMessageContent = newMessageContent.substring(0,newMessageContent.length() - 1); // delete "}"
+				newMessageContent = newMessageContent + ", \"stop\": " + stop + "}";
+
+//				m.setContent("{\"id\":\""+user2.getId()+
+//						"\", \"roomId\": \""+matchId+"\",\"score\":\""+user1Score+"\", \"choice\": \""+user1Res+"\"}");
+				m.setContent(newMessageContent);
 				myAgent.send(m);
 
-				m = new ACLMessage(ACLMessage.INFORM);
-				m.addReceiver(new AID("EnvAgent", AID.ISLOCALNAME));
-				m.setContent("{\"msgTo\":\""+user1.getId()+
-						"\", \"opponent\": \""+user2.getId()+"\",\"score\":\""+user2Score+"\", \"choice\": \""+user2Res+"\"}");
+				//To user2
+				m = message2.createReply();
+				m.setPerformative(ACLMessage.INFORM);
+				m.addReceiver(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME));
+
+				newMessageContent = message1.getContent();
+				newMessageContent = newMessageContent.substring(0,newMessageContent.length() - 1); // delete "}"
+				newMessageContent = newMessageContent + ", \"stop\": " + stop + "}";
+				m.setContent(newMessageContent);
 				myAgent.send(m);
 
 				iterator++;
@@ -227,17 +243,16 @@ public class MatchAgent extends Agent {
 
 		//get the response of a specific user
 		private void checkMsg(String msg) {
-            ObjectMapper mapper = new ObjectMapper();
             JsonNode rootNode;
 			try {
 				rootNode = mapper.readTree(msg);
 				//{UserId: xxx, Option: 2, Score: xxx}
-				if(Integer.parseInt(rootNode.path("UserId").asText()) == user1.getId()) {
-					user1Res = Integer.parseInt(rootNode.path("Option").asText());
-					user1Score = Integer.parseInt(rootNode.path("Score").asText());
+				if(rootNode.path("UserId").asInt() == user1.getId()) {
+					user1Res = rootNode.path("Option").asInt();
+					user1Score = rootNode.path("Score").asInt();
 				}else {
-					user2Res = Integer.parseInt(rootNode.path("Option").asText());
-					user2Score = Integer.parseInt(rootNode.path("Score").asText());
+					user2Res = rootNode.path("Option").asInt();
+					user2Score = rootNode.path("Score").asInt();
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -247,7 +262,7 @@ public class MatchAgent extends Agent {
 
 		@Override
 		public boolean done() {
-			Boolean isDone = false;
+			boolean isDone = false;
 			if(iterator == 10) {
 				isDone = true;
 			}
@@ -281,7 +296,6 @@ public class MatchAgent extends Agent {
 				if (message != null) {
 					questionsJson = message.getContent();
 
-                    ObjectMapper mapper = new ObjectMapper();
                     try {
                         questionsList = mapper.readValue(questionsJson, new TypeReference<List<Question>>() {});
                     } catch (IOException e) {
@@ -322,7 +336,6 @@ public class MatchAgent extends Agent {
 		private String generateReplyJson(User userSelf, User opponent) {
 			Map<String, Object> map = new HashMap<>();
 
-            ObjectMapper mapper = new ObjectMapper();
 
             String jsonString = null;
             try {
@@ -332,6 +345,7 @@ public class MatchAgent extends Agent {
                 map.put("questions",questionsJSON);
                 map.put("matchId", matchId);
                 map.put("withFriend", DAOFactory.getFriendDAO().user1IsFriendOfUser2(userSelf, opponent));
+                map.put("subject", matchSubject);
                 jsonString = mapper.writeValueAsString(map);
             } catch (JsonProcessingException e) {
                 jsonString = "{\"success\": false}";

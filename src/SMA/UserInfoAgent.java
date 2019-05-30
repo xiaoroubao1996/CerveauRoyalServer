@@ -98,6 +98,8 @@ public class UserInfoAgent extends Agent {
                     case ACLMessage.INFORM:
                         content = message.getContent();
                         System.out.println(myAgent.getLocalName() + "--> getInform ");
+
+
                         user = User.read(content);
                         DAOFactory.getUserDAO().update(user);
 
