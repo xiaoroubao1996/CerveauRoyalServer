@@ -77,15 +77,27 @@ public class SearchMatchAgent extends Agent {
 //                might be useless
 //                addBehaviour(new doSearchingBehaviour());
          
-                //GET match
-                ArrayList<AID> matches = new ArrayList<AID>(DF.findAgents(myAgent, subject, String.valueOf(user.getRank())));
-               //if we find a match
-                if (matches.size() > 0) {
-                    addBehaviour(new getMatchBehaviour(matches.get(0)));
-                //if we dont
-                }else{
-                    addBehaviour(new newMatchBehaviour());
-                }
+                
+                //if withFriend==true just need to create new agent. 
+                //and only in the case of newMatchBehaviour we need to send these two var to MatchAgent
+                if(withUser==true && userId.length() != 0) {
+                	 addBehaviour(new newMatchBehaviour());
+                }else { 
+                	//GET match
+                    ArrayList<AID> matches = new ArrayList<AID>(DF.findAgents(myAgent, subject, String.valueOf(user.getRank())));
+                    //if we find a match
+                    if (matches.size() > 0) {
+                         addBehaviour(new getMatchBehaviour(matches.get(0)));
+                    //if we dont
+                    }else{
+                        addBehaviour(new newMatchBehaviour());
+                    }
+                	
+                }		
+             
+                
+                
+           
             }
 
 
@@ -223,6 +235,7 @@ public class SearchMatchAgent extends Agent {
 //		return jsonString;
 //	}
     
+     		
     //create a new match
     private class newMatchBehaviour extends OneShotBehaviour {
 
@@ -238,7 +251,6 @@ public class SearchMatchAgent extends Agent {
                params.put("userId",userId);
                //new agent new + time
 
-               //zhiyou zai zhezong qingkuang huixuyao withFriends and user id
                params.put("MessageToReplyUser1",ACLMessageFromEnv);
                list[0] = params;
                JadeModel.getContainer().createNewAgent(Constant.MATCH_NAME + String.valueOf(System.currentTimeMillis()), "SMA.MatchAgent",list).start();
