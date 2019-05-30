@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import Model.Constant;
+import Model.JadeModel;
 import Model.Question;
 import Model.User;
 import jade.core.AID;
@@ -20,12 +21,15 @@ import jade.core.Agent;
 import jade.core.behaviours.*;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.wrapper.StaleProxyException;
 
 public class MatchAgent extends Agent {
 	private User user1;
 	private User user2;
 	private int user1Score;
 	private int user2Score;
+	private String opponentId;
+	private Boolean withUser;
 	private String matchSubject;
 	private String matchId;
 	private ArrayList<Question> questionsList;
@@ -45,6 +49,11 @@ public class MatchAgent extends Agent {
 
 		matchSubject = (String) map.get("Subject");
 		user1 = (User) map.get("user");
+		withUser = (Boolean) map.get("withUser");
+		opponentId = (String) map.get("userId");
+		//need to send FriendAgent subject userid and myid
+		
+		
         MessageToReplyUser1 = (ACLMessage) map.get("MessageToReplyUser1");
         MessageToReplyUser1 = MessageToReplyUser1.createReply();
 		String matchLevel = String.valueOf(user1.getRank());
@@ -52,6 +61,10 @@ public class MatchAgent extends Agent {
 		// register this MatchAgent into the DF
 		DF.registerAgent(this, matchSubject, matchLevel);
         matchId = this.getName();
+        
+        if(withUser == true) {
+        	addBehaviour(new CreatFriendAgentBehaviour());
+        }
 
 		// The main behaviour in this Agent
 		SequentialBehaviour MatchSequentialBehaviour = new SequentialBehaviour();
@@ -101,6 +114,37 @@ public class MatchAgent extends Agent {
 
 		addBehaviour(MatchSequentialBehaviour);
 	}
+	
+	
+	private class CreatFriendAgentBehaviour extends Behaviour{
+
+		@Override
+		public void action() {
+	           try {
+	               Object[] list = new Object[1];
+	               Map<String, Object> params = new HashMap<>();
+	               params.put("userId", user1.getId());
+	               params.put("subject", matchSubject);
+	               params.put("opponentId", opponentId);
+	               //new agent new + time
+//	               params.put("MessageToReplyUser1", ACLMessageFromEnv);
+	               list[0] = params;
+	               JadeModel.getContainer().createNewAgent(Constant.FRIEND_NAME + String.valueOf(System.currentTimeMillis()), "SMA.MatchAgent",list).start();
+	           } catch (StaleProxyException e) {
+	               e.printStackTrace();
+	           }
+	        }
+		
+		
+		
+		@Override
+		public boolean done() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+	
+	}	
+	
 
 	private class GameOverBehaviour extends Behaviour{
 

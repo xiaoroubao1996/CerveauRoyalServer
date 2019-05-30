@@ -28,6 +28,7 @@ public class Constant {
     public static final String USER_INFO_NAME = "userInfoAgent";
     public static final String QUESTION_NAME = "questionAgent";
     public static final String MATCH_NAME = "matchAgent";
+    public static final String FRIEND_NAME = "friendAgent";
 
 
     //Integer

@@ -241,7 +241,6 @@ public class SearchMatchAgent extends Agent {
 
         @Override
         public void action() {
-           MatchAgent newMatch = new MatchAgent();
            try {
                Object[] list = new Object[1];
                Map<String, Object> params = new HashMap<>();
