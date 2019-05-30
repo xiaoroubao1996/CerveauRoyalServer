@@ -7,4 +7,8 @@ public class DAOFactory {
     public static QuestionDAO  getQuestionDAO(){
         return new QuestionDAO();
     }
+
+    public static FriendDAO getFriendDAO(){
+        return new FriendDAO();
+    }
 }

@@ -12,6 +12,14 @@ public class Constant {
         MUSIC
     }
 
+    public enum RANK {
+        PAWN,
+        KNIGHT,
+        BISHOP,
+        TOWER,
+        QUEEN
+    }
+
 
     //String
     public static final String JADEGATEWAY_NAME = "ControlContainer-1@cerveauroyal";
@@ -19,6 +27,7 @@ public class Constant {
     public static final String SEARCH_MATCH_NAME = "searchMatchAgent";
     public static final String USER_INFO_NAME = "userInfoAgent";
     public static final String QUESTION_NAME = "questionAgent";
+    public static final String MATCH_NAME = "matchAgent";
 
 
     //Integer
@@ -26,5 +35,6 @@ public class Constant {
     public static final int SMA_GET = 1;
     public static final int SMA_POST = 2;
     public static final int SMA_PUT = 3;
+    public static final int SMA_SUBSCRIBE = 4;
 
 }

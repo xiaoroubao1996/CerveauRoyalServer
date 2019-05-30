@@ -45,7 +45,8 @@ public class UserDAO {
                         result.getInt("numLoseEnglish"),
                         result.getInt("numWinCommonsense"),
                         result.getInt("numLoseCommonsense"),
-                        result.getString("deviceToken")
+                        result.getString("deviceToken"),
+                        result.getString("rank")
                 );
             }
             conn.close();
@@ -94,7 +95,8 @@ public class UserDAO {
                         result.getInt("numLoseEnglish"),
                         result.getInt("numWinCommonsense"),
                         result.getInt("numLoseCommonsense"),
-                        result.getString("deviceToken")
+                        result.getString("deviceToken"),
+                        result.getString("rank")
                 );
             }
             conn.close();
@@ -142,7 +144,8 @@ public class UserDAO {
                         result.getInt("numLoseEnglish"),
                         result.getInt("numWinCommonsense"),
                         result.getInt("numLoseCommonsense"),
-                        result.getString("deviceToken")
+                        result.getString("deviceToken"),
+                        result.getString("rank")
                 );
 
                 resultList.add(user);
@@ -159,7 +162,7 @@ public class UserDAO {
     }
 
     
-    public void add(User user) {
+    public void add(User user) throws SQLException {
         Connection conn = null;
         PreparedStatement sqlPrepare;
         try {
@@ -179,7 +182,7 @@ public class UserDAO {
 
             conn.close();
         } catch (SQLException se) {
-            se.printStackTrace();
+            throw se;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -196,7 +199,7 @@ public class UserDAO {
             sql = "UPDATE User SET nickname= ?, email= ?, password= ?, avatar= ?, score = ?, "
                     + "numWinLiterature = ? , numLoseLiterature = ?, numWinMath = ?, numLoseMath = ?, numWinArt = ?, numLoseArt = ?, numWinHistory = ?, numLoseHistory = ?,"
                     + "numWinMusic = ?, numLoseMusic = ?, numWinGeography = ?, numLoseGeography = ?, numWinEnglish = ?, numLoseEnglish = ?, numWinCommonsense = ?, numLoseCommonsense = ?,"
-                    + "deviceToken = ? WHERE id = ?";
+                    + "deviceToken = ?, rank = ? WHERE id = ?";
 
             sqlPrepare=conn.prepareStatement(sql);
             sqlPrepare.setString(1,user.getnickname());
@@ -221,7 +224,9 @@ public class UserDAO {
             sqlPrepare.setInt(20,user.getNumLoseCommonsense());
             sqlPrepare.setInt(21,user.getNumWinEnglish());
             sqlPrepare.setString(22,user.getDeviceToken());
-            sqlPrepare.setInt(23,user.getId());
+            sqlPrepare.setString(23,String.valueOf(user.getRank()));
+            sqlPrepare.setInt(24,user.getId());
+
             sqlPrepare.executeUpdate();
 
 
