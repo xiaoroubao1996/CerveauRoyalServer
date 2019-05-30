@@ -45,7 +45,7 @@ public class QuestionAgent extends Agent {
 
                     questions = DAOFactory.getQuestionDAO().selectBySubject(subject);
 
-                    //random 10 question
+                    //TODO random 10 question
 //                    questions = randomQuestion(questions);
 
                     jsonStr = mapper.writeValueAsString(questions);

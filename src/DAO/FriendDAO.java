@@ -17,7 +17,7 @@ public class FriendDAO {
         try {
             conn = SQL.getSQLConnection();
             String sql;
-            sql = "SELECT * FROM Friend WHERE user1 = ? AND user2 = ?";
+            sql = "SELECT * FROM Friend WHERE user1Id = ? AND user2Id = ?";
             sqlPrepare=conn.prepareStatement(sql);
             sqlPrepare.setInt(1,user1.getId());
             sqlPrepare.setInt(2,user2.getId());

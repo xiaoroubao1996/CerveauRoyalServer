@@ -328,13 +328,13 @@ public class MatchAgent extends Agent {
 				ACLMessage m = new ACLMessage(ACLMessage.REQUEST);
 				// TODO: doubleCheck the AID of questionDataAgent
 				m.addReceiver(new AID(Constant.QUESTION_NAME, AID.ISLOCALNAME));
-				m.setContent("{\"Subjet\":\"" + matchSubject + "\"}");
+				m.setContent("{\"subject\":\"" + matchSubject + "\"}");
 				myAgent.send(m);
 				step = 1;
 				break;
 			case 1:
 				MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST),
-						MessageTemplate.MatchSender(new AID("questionDataAgent", AID.ISLOCALNAME)));
+						MessageTemplate.MatchSender(new AID(Constant.QUESTION_NAME, AID.ISLOCALNAME)));
 				ACLMessage message = receive(mt);
 
 				if (message != null) {
