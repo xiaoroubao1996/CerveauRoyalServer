@@ -154,25 +154,30 @@ public class MatchAgent extends Agent {
 		int user2Res = 0;
 		int correctRes;
 		String msgJson;
-        ACLMessage message1;
-        ACLMessage message2;
+        ACLMessage message1 = null;
+        ACLMessage message2 = null;
+        boolean stop = false;
 
 		@Override
 		public void action() {
 			switch(step) {
 			case 0:
 				//waiting for the reply from both users
-				//15 s for each question
-				while(endTime > System.currentTimeMillis()) {
-					correctRes = questionsList.get(iterator).getAnswer();
-					//TODO: doubleCheck the sender and performative
-					MessageTemplate mt1 = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
-							MessageTemplate.MatchSender(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME)));
-					message1 = receive(mt1);
+				//20 s for each question
+				MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+						MessageTemplate.MatchSender(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME)));
 
-					MessageTemplate mt2 = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
-							MessageTemplate.MatchSender(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME)));
-					message2 = receive(mt2);
+				if(endTime > System.currentTimeMillis()) {
+					//correctRes = questionsList.get(iterator).getAnswer();
+					//TODO: doubleCheck the sender and performative
+
+					if(message1 == null){
+						message1 = receive(mt);
+
+					}
+					if(message2 == null){
+						message2 = receive(mt);
+					}
 
 					if (message1 != null && message2 != null) {
 						msgJson = message1.getContent();
@@ -185,6 +190,10 @@ public class MatchAgent extends Agent {
 					} else {
 						block();
 					}
+				}else{
+					step++;
+					iterator = 10;
+					stop = true;
 				}
 				break;
 			case 1:

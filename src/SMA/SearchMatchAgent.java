@@ -53,7 +53,7 @@ public class SearchMatchAgent extends Agent {
                 String email = null;
                 String subject = null;
                 Boolean withFriend = null;
-                String friendEmail = null;
+                int friendId = 0;
                 User user = null;
                 try {
                     rootNode = mapper.readTree(message.getContent());
@@ -61,9 +61,11 @@ public class SearchMatchAgent extends Agent {
                     subject = rootNode.path("subject").asText();
                     withFriend = rootNode.path("withFriend").asBoolean();
                     if(withFriend){
-                        friendEmail = rootNode.path("subject").asText();
+                        friendId = rootNode.path("userId").asInt();
                     }
-                    user = DAOFactory.getUserDAO().selectByEmail(email);
+                    user = DAOFactory.getUserDAO().selectByID(friendId);
+
+                    //TODO
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
