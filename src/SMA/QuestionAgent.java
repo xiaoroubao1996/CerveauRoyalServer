@@ -41,7 +41,7 @@ public class QuestionAgent extends Agent {
                 String jsonStr = null;
                 try {
                     JsonNode rootNode = mapper.readTree(content); // read Json
-                    String subject = rootNode.path("subject").asText();
+                    int subject = rootNode.path("subject").asInt();
 
                     questions = DAOFactory.getQuestionDAO().selectBySubject(subject);
 

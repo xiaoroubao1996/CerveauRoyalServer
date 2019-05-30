@@ -30,7 +30,7 @@ public class MatchAgent extends Agent {
 	private int user2Score;
 	private Integer opponentId;
 	private Boolean withUser;
-	private String matchSubject;
+	private int matchSubject;
 	private String matchId;
 	private ArrayList<Question> questionsList;
 	private String questionsJson;
@@ -48,7 +48,7 @@ public class MatchAgent extends Agent {
 		Object[] objects = getArguments();
 		Map map = (Map) objects[0];
 
-		matchSubject = (String) map.get("subject");
+		matchSubject = (int) map.get("subject");
 		user1 = (User) map.get("user");
 		withUser = (Boolean) map.get("withUser");
 		opponentId = (Integer) map.get("userId");
@@ -59,7 +59,7 @@ public class MatchAgent extends Agent {
 		String matchLevel = String.valueOf(user1.getRank());
 
 		// register this MatchAgent into the DF
-		DF.registerAgent(this, matchSubject, matchLevel);
+		DF.registerAgent(this, String.valueOf(matchSubject), matchLevel);
         matchId = this.getName();
         
 		// The main behaviour in this Agent
@@ -179,7 +179,7 @@ public class MatchAgent extends Agent {
 
 		int iterator = 0 ;
 		int step = 0;
-		long endTime = System.currentTimeMillis() + 20000;
+		long endTime = System.currentTimeMillis() + Constant.MATCH_EACH_ROUND_TIME_MAX;
 		int user1Res = 0;
 		int user2Res = 0;
 		int correctRes;
@@ -194,7 +194,7 @@ public class MatchAgent extends Agent {
 			case 0:
 				//waiting for the reply from both users
 				//20 s for each question
-				MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+				MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.PROPOSE),
 						MessageTemplate.MatchSender(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME)));
 
 				if(endTime > System.currentTimeMillis()) {

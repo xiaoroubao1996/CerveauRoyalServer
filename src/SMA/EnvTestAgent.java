@@ -38,7 +38,8 @@ public class EnvTestAgent extends Agent{
                     messageToSMA.setContent(message.getContent());
                     messageToSMA.setConversationId(message.getConversationId());
                     send(messageToSMA);
-                        step++;
+                    System.out.println(message.getContent());
+//                        step++;
                     }else{
                         block();
                     }

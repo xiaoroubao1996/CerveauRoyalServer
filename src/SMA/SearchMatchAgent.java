@@ -29,7 +29,7 @@ public class SearchMatchAgent extends Agent {
 
 	private User user;
 	private Integer id;
-	private String subject;
+	private int subject;
 	private ACLMessage ACLMessageFromEnv;
 	private Boolean withUser;
 	private Integer userId;
@@ -42,7 +42,7 @@ public class SearchMatchAgent extends Agent {
 		// initialization
 		user = null;
 		id = -1;
-		subject = "";
+		subject = 0;
 		ACLMessageFromEnv = null;
 		withUser = false;
 		userId = 0;
@@ -64,7 +64,7 @@ public class SearchMatchAgent extends Agent {
 				try {
 					rootNode = mapper.readTree(message.getContent());
 					id = rootNode.path("id").asInt();
-					subject = rootNode.path("subject").asText();
+					subject = rootNode.path("subject").asInt();
 					withUser = rootNode.path("withUser").asBoolean();
 					if(withUser == true ) {
 						userId = rootNode.path("userId").asInt();
@@ -85,7 +85,7 @@ public class SearchMatchAgent extends Agent {
 				} else {
 					// GET match
 					ArrayList<AID> matches = new ArrayList<AID>(
-							DF.findAgents(myAgent, subject, String.valueOf(user.getRank())));
+							DF.findAgents(myAgent, String.valueOf(subject), String.valueOf(user.getRank())));
 					// if we find a match
 					if (matches.size() > 0) {
 						addBehaviour(new getMatchBehaviour(matches.get(0)));
@@ -266,6 +266,7 @@ public class SearchMatchAgent extends Agent {
 				params.put("MessageToReplyUser1", ACLMessageFromEnv);
 				list[0] = params;
 				newMatchAID = Constant.MATCH_NAME + String.valueOf(System.currentTimeMillis());
+				System.out.println(newMatchAID);
 				JadeModel.getContainer().createNewAgent(newMatchAID, "SMA.MatchAgent", list).start();
 			} catch (StaleProxyException e) {
 				e.printStackTrace();
