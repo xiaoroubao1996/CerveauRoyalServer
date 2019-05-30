@@ -27,18 +27,30 @@ import java.util.Map;
 
 public class SearchMatchAgent extends Agent {
 
-    private User user1;
+    private User user;
+    private Integer id;
     private String subject;
     private ACLMessage ACLMessageFromEnv;
+    private Boolean withUser;
+    private String userId;
+    
 
     protected void setup() {
         System.out.println(getLocalName()+ "--> Installed");
         DF.registerAgent(this, Constant.SEARCH_MATCH_NAME, getLocalName());
-        user1 = null;
+        
+        //initialization 
+        user = null;
+        id = -1;
         subject = "";
+        ACLMessageFromEnv = null;
+        withUser = false;
+        userId = "";
+        
         addBehaviour(new waitMsgBehaviour());
     }
 
+    
     private class waitMsgBehaviour extends CyclicBehaviour {
 
         @Override
@@ -49,31 +61,24 @@ public class SearchMatchAgent extends Agent {
             if (message != null && message.getSender().getName().equals(Constant.ENVIRONEMENT_NAME)) {
                 ACLMessageFromEnv = message;
                 ObjectMapper mapper = new ObjectMapper();
-                JsonNode rootNode = null; // read Json
-                String email = null;
-                String subject = null;
-                Boolean withFriend = null;
-                int friendId = 0;
-                User user = null;
+                JsonNode rootNode = null; 
+                // read Json
                 try {
                     rootNode = mapper.readTree(message.getContent());
-                    email = rootNode.path("email").asText();
+                    id = rootNode.path("id").asInt();
                     subject = rootNode.path("subject").asText();
-                    withFriend = rootNode.path("withFriend").asBoolean();
-                    if(withFriend){
-                        friendId = rootNode.path("userId").asInt();
-                    }
-                    user = DAOFactory.getUserDAO().selectByID(friendId);
-
-                    //TODO
+                    withUser = rootNode.path("withUser").asBoolean();
+                    userId = rootNode.path("userId").asText();
+                    //get the user info
+                    user = DAOFactory.getUserDAO().selectByID(id);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+//                might be useless
 //                addBehaviour(new doSearchingBehaviour());
-
-
+         
                 //GET match
-                ArrayList<AID> matches = new ArrayList<AID>(DF.findAgents(myAgent, subject, String.valueOf(user1.getRank())));
+                ArrayList<AID> matches = new ArrayList<AID>(DF.findAgents(myAgent, subject, String.valueOf(user.getRank())));
                //if we find a match
                 if (matches.size() > 0) {
                     addBehaviour(new getMatchBehaviour(matches.get(0)));
@@ -86,6 +91,8 @@ public class SearchMatchAgent extends Agent {
 
         }
     }
+
+    
 
     //send message other user to match to begin the game
     private class getMatchBehaviour extends OneShotBehaviour {
@@ -100,7 +107,7 @@ public class SearchMatchAgent extends Agent {
         public void action() {
             ACLMessage message = new ACLMessage(ACLMessage.SUBSCRIBE);
             message.addReceiver(matchAID);
-            message.setContent(user1.toJSON());
+            message.setContent(user.toJSON());
             //add replyTo so the message to Match reply directly to Env (escape SearchMatchAgent)
             message.addReplyTo(new AID(Constant.ENVIRONEMENT_NAME,AID.ISLOCALNAME));
             message.setConversationId(ACLMessageFromEnv.getConversationId());
@@ -200,6 +207,22 @@ public class SearchMatchAgent extends Agent {
 //        }
 //    }
 
+
+//	private String generateDataJson(User user, Boolean withUser, String userId) {
+//		Map<String, Object> map = new HashMap<>();
+//        ObjectMapper mapper = new ObjectMapper();
+//        String jsonString = null;
+//        try {
+//            map.put("user",user.toJSON());
+//            map.put("withUser", withUser);
+//            map.put("userId", userId);
+//            jsonString = mapper.writeValueAsString(map);
+//        } catch (JsonProcessingException e) {
+////            jsonString = "{\"success\": false}";
+//        }
+//		return jsonString;
+//	}
+    
     //create a new match
     private class newMatchBehaviour extends OneShotBehaviour {
 
@@ -210,7 +233,12 @@ public class SearchMatchAgent extends Agent {
                Object[] list = new Object[1];
                Map<String, Object> params = new HashMap<>();
                params.put("subject", subject);
-               params.put("user1", user1);
+               params.put("user", user);
+               params.put("withUser", withUser);
+               params.put("userId",userId);
+               //new agent new + time
+
+               //zhiyou zai zhezong qingkuang huixuyao withFriends and user id
                params.put("MessageToReplyUser1",ACLMessageFromEnv);
                list[0] = params;
                JadeModel.getContainer().createNewAgent(Constant.MATCH_NAME + String.valueOf(System.currentTimeMillis()), "SMA.MatchAgent",list).start();
