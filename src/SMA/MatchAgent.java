@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import Model.Constant;
+import Model.JadeModel;
 import Model.Question;
 import Model.User;
 import jade.core.AID;
@@ -20,30 +21,39 @@ import jade.core.Agent;
 import jade.core.behaviours.*;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.wrapper.StaleProxyException;
 
 public class MatchAgent extends Agent {
 	private User user1;
 	private User user2;
 	private int user1Score;
 	private int user2Score;
+	private Integer opponentId;
+	private Boolean withUser;
 	private String matchSubject;
 	private String matchId;
 	private ArrayList<Question> questionsList;
 	private String questionsJson;
 	private ACLMessage MessageToReplyUser1;
 	private ACLMessage MessageToReplyUser2;
+	private ObjectMapper mapper = new ObjectMapper();
 
 	protected void setup() {
 		System.out.println(getLocalName() + "--> Installed");
 
 		user1Score = 0;
         user2Score = 0;
+        opponentId = 0 ;
 
 		Object[] objects = getArguments();
 		Map map = (Map) objects[0];
 
-		matchSubject = (String) map.get("Subject");
+		matchSubject = (String) map.get("subject");
 		user1 = (User) map.get("user");
+		withUser = (Boolean) map.get("withUser");
+		opponentId = (Integer) map.get("userId");
+		
+		
         MessageToReplyUser1 = (ACLMessage) map.get("MessageToReplyUser1");
         MessageToReplyUser1 = MessageToReplyUser1.createReply();
 		String matchLevel = String.valueOf(user1.getRank());
@@ -51,7 +61,7 @@ public class MatchAgent extends Agent {
 		// register this MatchAgent into the DF
 		DF.registerAgent(this, matchSubject, matchLevel);
         matchId = this.getName();
-
+        
 		// The main behaviour in this Agent
 		SequentialBehaviour MatchSequentialBehaviour = new SequentialBehaviour();
 
@@ -100,6 +110,25 @@ public class MatchAgent extends Agent {
 
 		addBehaviour(MatchSequentialBehaviour);
 	}
+	
+
+
+	private String generateDataJson(User user, Boolean withUser, String userId) {
+		Map<String, Object> map = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonString = null;
+        try {
+            map.put("user",user.toJSON());
+            map.put("withUser", withUser);
+            map.put("userId", userId);
+            jsonString = mapper.writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+//            jsonString = "{\"success\": false}";
+        }
+		return jsonString;
+	}
+  
+	
 
 	private class GameOverBehaviour extends Behaviour{
 
@@ -120,19 +149,20 @@ public class MatchAgent extends Agent {
 
 
 			//update the score of user 1 and user 2
-			//{userId:xx, subject:xxx,win:true}
+			//{user: user}
+
+			user1.updateMatchResult(user1Win,matchSubject);
+			user2.updateMatchResult(user2Win,matchSubject);
+
+
 			ACLMessage m = new ACLMessage(ACLMessage.INFORM);
-			m.addReceiver(new AID("UserInfoAgent", AID.ISLOCALNAME));
-			m.setContent("{\"userId\":\""+user1.getId()+
-					"\", \"subject\": \""+matchSubject+
-					"\",\"isWinner\":\""+user1Win+"\"}");
+			m.addReceiver(new AID(Constant.USER_INFO_NAME, AID.ISLOCALNAME));
+			m.setContent(user1.toJSON());
 			myAgent.send(m);
 
 			m = new ACLMessage(ACLMessage.INFORM);
-			m.addReceiver(new AID("UserInfoAgent", AID.ISLOCALNAME));
-			m.setContent("{\"userId\":\""+user2.getId()+
-					"\", \"subject\": \""+matchSubject+
-					"\",\"isWinner\":\""+user2Win+"\"}");
+			m.addReceiver(new AID(Constant.USER_INFO_NAME, AID.ISLOCALNAME));
+			m.setContent(user2.toJSON());
 			myAgent.send(m);
 
 			myAgent.doDelete();
@@ -154,25 +184,30 @@ public class MatchAgent extends Agent {
 		int user2Res = 0;
 		int correctRes;
 		String msgJson;
-        ACLMessage message1;
-        ACLMessage message2;
+        ACLMessage message1 = null;
+        ACLMessage message2 = null;
+        boolean stop = false;
 
 		@Override
 		public void action() {
 			switch(step) {
 			case 0:
 				//waiting for the reply from both users
-				//15 s for each question
-				while(endTime > System.currentTimeMillis()) {
-					correctRes = questionsList.get(iterator).getAnswer();
-					//TODO: doubleCheck the sender and performative
-					MessageTemplate mt1 = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
-							MessageTemplate.MatchSender(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME)));
-					message1 = receive(mt1);
+				//20 s for each question
+				MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+						MessageTemplate.MatchSender(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME)));
 
-					MessageTemplate mt2 = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
-							MessageTemplate.MatchSender(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME)));
-					message2 = receive(mt2);
+				if(endTime > System.currentTimeMillis()) {
+					//correctRes = questionsList.get(iterator).getAnswer();
+					//TODO: doubleCheck the sender and performative
+
+					if(message1 == null){
+						message1 = receive(mt);
+
+					}
+					if(message2 == null){
+						message2 = receive(mt);
+					}
 
 					if (message1 != null && message2 != null) {
 						msgJson = message1.getContent();
@@ -185,23 +220,41 @@ public class MatchAgent extends Agent {
 					} else {
 						block();
 					}
+
+				//which means one of the users lose his connection
+				}else{
+					step++;
+					iterator = 10;
+					stop = true;
 				}
 				break;
 			case 1:
 				//return the option chosen by another user as well as the score of another user
-				//{"msgTo":"id", "opponent": "id","score":"x", "choice": "x"}
+				//{"id":id,"matchId":matchId, "index": Index,"answer": answer. "score":score, "stop", stop}
 
-                ACLMessage m = message1.
-                        new ACLMessage(ACLMessage.INFORM);
+				//To user1
+                ACLMessage m = message1.createReply();
+                m.setPerformative(ACLMessage.INFORM);
 				m.addReceiver(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME));
-				m.setContent("{\"msgTo\":\""+user2.getId()+
-						"\", \"opponent\": \""+user1.getId()+"\",\"score\":\""+user1Score+"\", \"choice\": \""+user1Res+"\"}");
+
+				String newMessageContent = message2.getContent();
+				newMessageContent = newMessageContent.substring(0,newMessageContent.length() - 1); // delete "}"
+				newMessageContent = newMessageContent + ", \"stop\": " + stop + "}";
+
+//				m.setContent("{\"id\":\""+user2.getId()+
+//						"\", \"roomId\": \""+matchId+"\",\"score\":\""+user1Score+"\", \"choice\": \""+user1Res+"\"}");
+				m.setContent(newMessageContent);
 				myAgent.send(m);
 
-				m = new ACLMessage(ACLMessage.INFORM);
-				m.addReceiver(new AID("EnvAgent", AID.ISLOCALNAME));
-				m.setContent("{\"msgTo\":\""+user1.getId()+
-						"\", \"opponent\": \""+user2.getId()+"\",\"score\":\""+user2Score+"\", \"choice\": \""+user2Res+"\"}");
+				//To user2
+				m = message2.createReply();
+				m.setPerformative(ACLMessage.INFORM);
+				m.addReceiver(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME));
+
+				newMessageContent = message1.getContent();
+				newMessageContent = newMessageContent.substring(0,newMessageContent.length() - 1); // delete "}"
+				newMessageContent = newMessageContent + ", \"stop\": " + stop + "}";
+				m.setContent(newMessageContent);
 				myAgent.send(m);
 
 				iterator++;
@@ -218,17 +271,16 @@ public class MatchAgent extends Agent {
 
 		//get the response of a specific user
 		private void checkMsg(String msg) {
-            ObjectMapper mapper = new ObjectMapper();
             JsonNode rootNode;
 			try {
 				rootNode = mapper.readTree(msg);
 				//{UserId: xxx, Option: 2, Score: xxx}
-				if(Integer.parseInt(rootNode.path("UserId").asText()) == user1.getId()) {
-					user1Res = Integer.parseInt(rootNode.path("Option").asText());
-					user1Score = Integer.parseInt(rootNode.path("Score").asText());
+				if(rootNode.path("UserId").asInt() == user1.getId()) {
+					user1Res = rootNode.path("Option").asInt();
+					user1Score = rootNode.path("Score").asInt();
 				}else {
-					user2Res = Integer.parseInt(rootNode.path("Option").asText());
-					user2Score = Integer.parseInt(rootNode.path("Score").asText());
+					user2Res = rootNode.path("Option").asInt();
+					user2Score = rootNode.path("Score").asInt();
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -238,7 +290,7 @@ public class MatchAgent extends Agent {
 
 		@Override
 		public boolean done() {
-			Boolean isDone = false;
+			boolean isDone = false;
 			if(iterator == 10) {
 				isDone = true;
 			}
@@ -259,20 +311,19 @@ public class MatchAgent extends Agent {
 				// request 10 questions in one time
 				ACLMessage m = new ACLMessage(ACLMessage.REQUEST);
 				// TODO: doubleCheck the AID of questionDataAgent
-				m.addReceiver(new AID("questionDataAgent", AID.ISLOCALNAME));
-				m.setContent("{\"Subjet\":\"" + matchSubject + "\"}");
+				m.addReceiver(new AID(Constant.QUESTION_NAME, AID.ISLOCALNAME));
+				m.setContent("{\"subject\":\"" + matchSubject + "\"}");
 				myAgent.send(m);
 				step = 1;
 				break;
 			case 1:
 				MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST),
-						MessageTemplate.MatchSender(new AID("questionDataAgent", AID.ISLOCALNAME)));
+						MessageTemplate.MatchSender(new AID(Constant.QUESTION_NAME, AID.ISLOCALNAME)));
 				ACLMessage message = receive(mt);
 
 				if (message != null) {
 					questionsJson = message.getContent();
 
-                    ObjectMapper mapper = new ObjectMapper();
                     try {
                         questionsList = mapper.readValue(questionsJson, new TypeReference<List<Question>>() {});
                     } catch (IOException e) {
@@ -313,7 +364,6 @@ public class MatchAgent extends Agent {
 		private String generateReplyJson(User userSelf, User opponent) {
 			Map<String, Object> map = new HashMap<>();
 
-            ObjectMapper mapper = new ObjectMapper();
 
             String jsonString = null;
             try {
@@ -323,6 +373,7 @@ public class MatchAgent extends Agent {
                 map.put("questions",questionsJSON);
                 map.put("matchId", matchId);
                 map.put("withFriend", DAOFactory.getFriendDAO().user1IsFriendOfUser2(userSelf, opponent));
+                map.put("subject", matchSubject);
                 jsonString = mapper.writeValueAsString(map);
             } catch (JsonProcessingException e) {
                 jsonString = "{\"success\": false}";
@@ -345,13 +396,46 @@ public class MatchAgent extends Agent {
 			if (message != null) {
 				System.out.println(myAgent.getLocalName() + "--> getRequest ");
 
-				//reply
-                MessageToReplyUser2 = message.createReply();
+				if(withUser == true) {		
+					ObjectMapper mapper = new ObjectMapper();
+					JsonNode rootNode = null;
+					// read Json
+					try {
+						rootNode = mapper.readTree(message.getContent());
+						Boolean success = rootNode.path("success").asBoolean();
+						//case 1-1: play the game with an user and the user accept the request
+						if(success == true && opponentId != 0) {
+							//get the user2 into this room then goto get the questionDataBehaviour
+							user2 = DAOFactory.getUserDAO().selectByID(opponentId);
+							MessageToReplyUser2 = message.createReply();
+							
+						}else {
+						//case 1-2: play the game with an user and the user REFUSE the request
+							//tell the user1 that request FALSE and delete this room
+							String jsonString = "{\"success\": false}";
+				            MessageToReplyUser1.setContent(jsonString);
+				            send(MessageToReplyUser1);
+							myAgent.doDelete();
+						}
+						//case 2: play the game with an user but the user does NOT reply 
+						//deleteOutOfTimeBehaviour will be launched and end this MatchAgent
+						//if the Friend response the request after the delete of MatchAgent, 
+						//TODO: Android app need to treat the OnErruer state. 
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					
+					
+					
+				}else {
+					//reply
+	                MessageToReplyUser2 = message.createReply();
 
-				// Get user2 info and add into this room, content is a json of a user object
-                String userString = message.getContent();
-				user2 = User.read(userString);
-
+					// Get user2 info and add into this room, content is a json of a user object
+	                String userString = message.getContent();
+					user2 = User.read(userString);
+				}
+				
 				done = true;
 			} else
 				block();

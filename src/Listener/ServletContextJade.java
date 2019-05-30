@@ -22,18 +22,18 @@ public class ServletContextJade implements ServletContextListener {
                  // properties: main=true; gui = true;
                  Runtime rt = Runtime.instance();
                  JadeModel jadeModel = new JadeModel();
-                         try {
-                             //initialize PrpfileImpl
+                     try {
+                         //initialize PrpfileImpl
 
-                             jadeModel.setContainer(rt.createMainContainer(jadeModel.getProfileImpl()));
+                         jadeModel.setContainer(rt.createMainContainer(jadeModel.getProfileImpl()));
 
-                             //put container to search agent
-                             jadeModel.getContainer().createNewAgent(Constant.SEARCH_MATCH_NAME, "SMA.SearchMatchAgent",null).start();
-                             jadeModel.getContainer().createNewAgent(Constant.ENVIRONEMENT_NAME, "SMA.EnvAgent",null).start();
-                             jadeModel.getContainer().createNewAgent(Constant.USER_INFO_NAME, "SMA.UserInfoAgent",null).start();
-                             System.out.println("Jade initialized");
-                         } catch (Exception ex) {
-                             ex.printStackTrace();
+                         //put container to search agent
+                         jadeModel.getContainer().createNewAgent(Constant.SEARCH_MATCH_NAME, "SMA.SearchMatchAgent",null).start();
+                         jadeModel.getContainer().createNewAgent(Constant.ENVIRONEMENT_NAME, "SMA.EnvAgent",null).start();
+                         jadeModel.getContainer().createNewAgent(Constant.USER_INFO_NAME, "SMA.UserInfoAgent",null).start();
+                         System.out.println("Jade initialized");
+                     } catch (Exception ex) {
+                         ex.printStackTrace();
                      }
 
 
