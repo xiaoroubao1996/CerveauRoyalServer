@@ -22,7 +22,7 @@ public class SMAServlet  extends HttpServlet {
      *
      */
     private static final long serialVersionUID = 1L;
-
+    private String JSONFromLastRequest = "";
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -32,38 +32,45 @@ public class SMAServlet  extends HttpServlet {
 
         String JSON = request.getParameter("JSON");
 
-//        Logger logger = Logger.getLogger(SMAServlet.class.getName());
-//        logger.warning(url);
-//        logger.warning("This is a warning!");
-//        logger.warning(JSON);
-
-
         int lastIndex = url.lastIndexOf("/");
         String urlREST = url.substring(lastIndex + 1);
         response.setContentType("text/html;charset=utf-8");
-        PrintWriter out = response.getWriter();
+        PrintWriter out = null;
         ProcessBehaviour behaviour = null;
         switch(urlREST){
             case("user"):
+                out = response.getWriter();
                 behaviour = new ProcessBehaviour(JSON, Constant.USER_INFO_NAME, Constant.SMA_GET);
                 activeAgent(behaviour);
                 out.println(behaviour.answer);
+                out.flush();
+                out.close();
                 break;
 
             case("login"):
+                out = response.getWriter();
                 behaviour = new ProcessBehaviour(JSON, Constant.USER_INFO_NAME, Constant.SMA_SUBSCRIBE);
                 activeAgent(behaviour);
                 out.println(behaviour.answer);
+                out.flush();
+                out.close();
                 break;
             case("match"):
-                behaviour = new ProcessBehaviour(JSON, Constant.SEARCH_MATCH_NAME, Constant.SMA_GET);
-                activeAgent(behaviour);
-                out.println(behaviour.answer);
+                if(!isSameRequestAsLastOne(JSON)){
+                    out = response.getWriter();
+                    Logger logger = Logger.getLogger(SMAServlet.class.getName());
+                    logger.warning(JSON);
+                    logger.warning("MyMessage from myservlet!");
+                    behaviour = new ProcessBehaviour(JSON, Constant.SEARCH_MATCH_NAME, Constant.SMA_GET);
+                    activeAgent(behaviour);
+                    out.println(behaviour.answer);
+                    out.flush();
+                    out.close();
+                }else{
+                    response.sendError(response.SC_ACCEPTED, "same request");
+                }
                 break;
         }
-
-        out.flush();
-        out.close();
     }
 
     @Override
@@ -78,27 +85,35 @@ public class SMAServlet  extends HttpServlet {
         int lastIndex = url.lastIndexOf("/");
         String urlREST = url.substring(lastIndex + 1);
         response.setContentType("text/html;charset=utf-8");
-        PrintWriter out = response.getWriter();
+        PrintWriter out = null;
         ProcessBehaviour behaviour = null;
         JsonNode rootNode = null;
         ObjectMapper mapper = new ObjectMapper();
 
         switch(urlREST){
             case("user"):
+                out = response.getWriter();
                 behaviour = new ProcessBehaviour(JSON, Constant.USER_INFO_NAME, Constant.SMA_POST);
                 activeAgent(behaviour);
                 out.println(behaviour.answer);
+                out.flush();
+                out.close();
                 break;
             case("match"):
-                rootNode = mapper.readTree(JSON);
-                String matchId = rootNode.path("matchId").asText();
-                behaviour = new ProcessBehaviour(JSON, matchId, Constant.SMA_POST);
-                activeAgent(behaviour);
-                out.println(behaviour.answer);
+//                if(!isSameRequestAsLastOne(JSON)){
+                    out = response.getWriter();
+                    rootNode = mapper.readTree(JSON);
+                    String matchId = rootNode.path("matchId").asText();
+                    behaviour = new ProcessBehaviour(JSON, matchId, Constant.SMA_POST);
+                    activeAgent(behaviour);
+                    out.println(behaviour.answer);
+                    out.flush();
+                    out.close();
+//                }else{
+//                    response.sendError(response.SC_ACCEPTED, "same request");
+//                }
                 break;
         }
-        out.flush();
-        out.close();
     }
 
     private void activeAgent(Behaviour behaviour) {
@@ -107,6 +122,14 @@ public class SMAServlet  extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean isSameRequestAsLastOne(String JSON){
+        if(JSON.equals(JSONFromLastRequest)){
+            return true;
+        }
+        JSONFromLastRequest = JSON;
+        return false;
     }
 
 }
