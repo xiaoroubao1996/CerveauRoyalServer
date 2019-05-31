@@ -5,7 +5,6 @@ import Model.Constant;
 import Model.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mysql.cj.util.StringUtils;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -25,7 +24,8 @@ public class FriendsAgent extends Agent{
     private AID MatchID;
     //private String subject;
     private String deviceToken;
-    public static final String API_GCM = "AIzaSyCAtOoMnNAj2uzqwebB_zrcxY6KciMwdbo";
+    //public static final String API_GCM = "AIzaSyCAtOoMnNAj2uzqwebB_zrcxY6KciMwdbo";
+    public static final String API_GCM = "AIzaSyDXVkHh-crxkYY73J7OvpLOa3mzufFIlfk";
 
     protected void setup() {
         System.out.println(getLocalName()+ "--> Installed");
@@ -55,6 +55,7 @@ public class FriendsAgent extends Agent{
             ObjectMapper mapper = new ObjectMapper();
             map.put("agentName", getLocalName());
             map.put("user",friend.toJSON());
+            deviceToken = friend.getDeviceToken();
             try {
                 String jsonStr = mapper.writeValueAsString(map);
                 ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
@@ -103,7 +104,7 @@ public class FriendsAgent extends Agent{
     public boolean sendMessageTest() throws IOException {
         Sender sender = new Sender(API_GCM);
         Message message = new Message.Builder()
-                .addData("Message", "Testing")
+                .addData("Message", "A Testing message")
                 .build();
         try {
             Result result = sender.send(message, deviceToken, 3);
