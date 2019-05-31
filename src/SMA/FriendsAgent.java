@@ -22,9 +22,10 @@ public class FriendsAgent extends Agent{
 
     private User friend;
     private AID MatchID;
-    private String subject;
+    //private String subject;
     private String deviceToken;
-    public static final String API_GCM = "AIzaSyCAtOoMnNAj2uzqwebB_zrcxY6KciMwdbo";
+    //public static final String API_GCM = "AIzaSyCAtOoMnNAj2uzqwebB_zrcxY6KciMwdbo";
+    public static final String API_GCM = "AIzaSyDXVkHh-crxkYY73J7OvpLOa3mzufFIlfk";
 
     protected void setup() {
         System.out.println(getLocalName()+ "--> Installed");
@@ -38,12 +39,11 @@ public class FriendsAgent extends Agent{
             Integer idFriend = (Integer) map.get("user_id");
             friend = DAOFactory.getUserDAO().selectByID(idFriend);
             MatchID = new AID((String) map.get("match_id"), AID.ISLOCALNAME);
-            subject = (String) map.get("subject");
-
+            //subject = (String) map.get("subject");
+            if (friend != null) addBehaviour(new sendInvitationBehaviour());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (friend != null) addBehaviour(new sendInvitationBehaviour());
         addBehaviour(new getReplyBehaviour());
     }
 
@@ -55,11 +55,13 @@ public class FriendsAgent extends Agent{
             ObjectMapper mapper = new ObjectMapper();
             map.put("agentName", getLocalName());
             map.put("user",friend.toJSON());
+            deviceToken = friend.getDeviceToken();
             try {
                 String jsonStr = mapper.writeValueAsString(map);
                 ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
                 request.addReceiver(new AID(Constant.JADEGATEWAY_NAME, AID.ISLOCALNAME));
                 request.setContent(jsonStr);
+                send(request);
                 sendMessageTest();
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
@@ -99,12 +101,25 @@ public class FriendsAgent extends Agent{
         }
     }
 
-    public void sendMessageTest() throws IOException {
+    public boolean sendMessageTest() throws IOException {
         Sender sender = new Sender(API_GCM);
         Message message = new Message.Builder()
-                .addData("Message", "Testing")
+                .addData("Message", "A Testing message")
                 .build();
-        Result result = sender.send(message, deviceToken, 5);
+        try {
+            Result result = sender.send(message, deviceToken, 3);
+
+            if (result.getErrorCodeName().isEmpty()) {
+                System.out.println("Message send without error");
+                return true;
+            }
+            System.err.println("Error occurred while sending push notification :" + result.getErrorCodeName());
+        } catch (InvalidRequestException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
 }
