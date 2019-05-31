@@ -1,1 +1,1 @@
-( ap-description  :name "cerveauroyal" :ap-services (set ( ap-service  :name fipa.mts.mtp.http.std :type fipa.mts.mtp.http.std :addresses (sequence http://USER-20170624IP:7778/acc))))
+( ap-description  :name "cerveauroyal" :ap-services (set ( ap-service  :name fipa.mts.mtp.http.std :type fipa.mts.mtp.http.std :addresses (sequence http://windows10.microdone.cn:7778/acc))))

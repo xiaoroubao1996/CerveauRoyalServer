@@ -2,6 +2,8 @@ package servlet;
 
 import Model.Constant;
 import SMA.ProcessBehaviour;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jade.core.behaviours.Behaviour;
 import jade.wrapper.gateway.JadeGateway;
 
@@ -53,16 +55,12 @@ public class SMAServlet  extends HttpServlet {
                 activeAgent(behaviour);
                 out.println(behaviour.answer);
                 break;
+            case("match"):
+                behaviour = new ProcessBehaviour(JSON, Constant.SEARCH_MATCH_NAME, Constant.SMA_GET);
+                activeAgent(behaviour);
+                out.println(behaviour.answer);
+                break;
         }
-
-//        System.out.println("处理Get请求。。。");
-//        response.setContentType("text/html;charset=utf-8");
-//        PrintWriter out = response.getWriter();
-//
-//        ProcessBehaviour behaviour = new ProcessBehaviour("testAgent", "this is content");
-//        activeAgent(behaviour);
-//
-//        out.println(behaviour.answer);
 
         out.flush();
         out.close();
@@ -82,24 +80,23 @@ public class SMAServlet  extends HttpServlet {
         response.setContentType("text/html;charset=utf-8");
         PrintWriter out = response.getWriter();
         ProcessBehaviour behaviour = null;
+        JsonNode rootNode = null;
+        ObjectMapper mapper = new ObjectMapper();
+
         switch(urlREST){
             case("user"):
                 behaviour = new ProcessBehaviour(JSON, Constant.USER_INFO_NAME, Constant.SMA_POST);
                 activeAgent(behaviour);
                 out.println(behaviour.answer);
                 break;
-
+            case("match"):
+                rootNode = mapper.readTree(JSON);
+                String matchId = rootNode.path("matchId").asText();
+                behaviour = new ProcessBehaviour(JSON, matchId, Constant.SMA_POST);
+                activeAgent(behaviour);
+                out.println(behaviour.answer);
+                break;
         }
-
-//        System.out.println("处理Get请求。。。");
-//        response.setContentType("text/html;charset=utf-8");
-//        PrintWriter out = response.getWriter();
-//
-//        ProcessBehaviour behaviour = new ProcessBehaviour("testAgent", "this is content");
-//        activeAgent(behaviour);
-//
-//        out.println(behaviour.answer);
-
         out.flush();
         out.close();
     }
