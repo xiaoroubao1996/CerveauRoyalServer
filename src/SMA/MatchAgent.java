@@ -60,7 +60,7 @@ public class MatchAgent extends Agent {
 
 		// register this MatchAgent into the DF
 		DF.registerAgent(this, String.valueOf(matchSubject), matchLevel);
-        matchId = this.getName();
+        matchId = this.getLocalName();
         
 		// The main behaviour in this Agent
 		SequentialBehaviour MatchSequentialBehaviour = new SequentialBehaviour();
