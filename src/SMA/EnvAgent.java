@@ -52,7 +52,7 @@ public class EnvAgent extends Agent{
             if(message != null){
                 // TODO
                 System.out.println(getLocalName() + " received message from someone");
-                if (message.getSender().getName().equals(Constant.JADEGATEWAY_NAME)) {
+                if (message.getSender().getLocalName().equals(Constant.JADEGATEWAY_NAME)) {
                     //get message from gateway
                     messageFromGateway = message;
                     System.out.println("env: get message from gate way");

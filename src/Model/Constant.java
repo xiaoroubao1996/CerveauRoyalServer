@@ -22,7 +22,8 @@ public class Constant {
 
 
     //String
-    public static final String JADEGATEWAY_NAME = "ControlContainer-1@cerveauroyal";
+//    public static final String JADEGATEWAY_NAME = "ControlContainer-1@cerveauroyal";
+    public static final String JADEGATEWAY_NAME = "ControlContainer-1";
     public static final String ENVIRONEMENT_NAME = "environementAgent";
     public static final String SEARCH_MATCH_NAME = "searchMatchAgent";
     public static final String USER_INFO_NAME = "userInfoAgent";
@@ -32,8 +33,8 @@ public class Constant {
 
 
     //Integer
-    public static final long MATCH_WAIT_TIME_MAX = 3000000;
-    public static final long MATCH_EACH_ROUND_TIME_MAX = 300000;
+    public static final long MATCH_WAIT_TIME_MAX = 30000;
+    public static final long MATCH_EACH_ROUND_TIME_MAX = 25000;
     public static final int SMA_GET = 1;
     public static final int SMA_POST = 2;
     public static final int SMA_PUT = 3;

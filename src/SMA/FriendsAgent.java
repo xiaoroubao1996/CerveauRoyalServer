@@ -79,7 +79,7 @@ public class FriendsAgent extends Agent{
             ACLMessage message = myAgent.receive(mt);
 
             if (message != null) {
-                if (message.getSender().getName().equals(Constant.JADEGATEWAY_NAME)) {
+                if (message.getSender().getLocalName().equals(Constant.JADEGATEWAY_NAME)) {
                     ObjectMapper mapper = new ObjectMapper();
                     try {
                         Map<String, Object> map = mapper.readValue(message.getContent(), Map.class);

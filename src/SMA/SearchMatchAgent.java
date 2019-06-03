@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class SearchMatchAgent extends Agent {
 
@@ -58,6 +59,7 @@ public class SearchMatchAgent extends Agent {
 			MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
 			ACLMessage message = myAgent.receive(mt);
 			if (message != null) {
+
 				ACLMessageFromEnv = message;
 				ObjectMapper mapper = new ObjectMapper();
 				JsonNode rootNode = null;
@@ -276,7 +278,7 @@ public class SearchMatchAgent extends Agent {
 
 				params.put("MessageToReplyUser1", ACLMessageFromEnv);
 				list[0] = params;
-				newMatchAID = Constant.MATCH_NAME + String.valueOf(System.currentTimeMillis());
+				newMatchAID = Constant.MATCH_NAME + System.currentTimeMillis();
 				System.out.println(newMatchAID);
 				JadeModel.getContainer().createNewAgent(newMatchAID, "SMA.MatchAgent", list).start();
 			} catch (StaleProxyException e) {
