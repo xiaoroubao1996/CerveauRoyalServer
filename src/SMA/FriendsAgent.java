@@ -24,8 +24,8 @@ public class FriendsAgent extends Agent{
     private AID MatchID;
     //private String subject;
     private String deviceToken;
-    //public static final String API_GCM = "AIzaSyCAtOoMnNAj2uzqwebB_zrcxY6KciMwdbo";
-    public static final String API_GCM = "AIzaSyDXVkHh-crxkYY73J7OvpLOa3mzufFIlfk";
+    public static final String API_GCM = "AIzaSyCAtOoMnNAj2uzqwebB_zrcxY6KciMwdbo";
+    //public static final String API_GCM = "AIzaSyDXVkHh-crxkYY73J7OvpLOa3mzufFIlfk";
 
     protected void setup() {
         System.out.println(getLocalName()+ "--> Installed");
@@ -36,10 +36,10 @@ public class FriendsAgent extends Agent{
         ObjectMapper mapper = new ObjectMapper();
         try {
             Map<String, Object> map = mapper.readValue((String) getArguments()[0], Map.class);
-            Integer idFriend = (Integer) map.get("user_id");
+            Integer idFriend = (Integer) map.get("userId");
             friend = DAOFactory.getUserDAO().selectByID(idFriend);
-            MatchID = new AID((String) map.get("match_id"), AID.ISLOCALNAME);
-            //subject = (String) map.get("subject");
+            MatchID = new AID((String) map.get("matchAgent"), AID.ISLOCALNAME);
+            System.out.println("Got aid de match :" +  MatchID);
             if (friend != null) addBehaviour(new sendInvitationBehaviour());
         } catch (IOException e) {
             e.printStackTrace();
