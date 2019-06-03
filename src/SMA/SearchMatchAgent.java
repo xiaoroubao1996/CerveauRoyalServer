@@ -156,9 +156,6 @@ public class SearchMatchAgent extends Agent {
 			message.addReplyTo(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME));
 			message.setConversationId(ACLMessageFromEnv.getConversationId());
 			send(message);
-			// remove the agent
-			DF.removeAgents(myAgent, matchAID);
-
 		}
 	}
 

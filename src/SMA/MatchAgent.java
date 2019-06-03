@@ -445,7 +445,8 @@ public class MatchAgent extends Agent {
 	                String userString = message.getContent();
 					user2 = User.read(userString);
 				}
-				
+				// remove the agent
+				DF.removeAgents(myAgent);
 				done = true;
 			} else
 				block();

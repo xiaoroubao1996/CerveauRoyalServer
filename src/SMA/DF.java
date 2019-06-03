@@ -46,11 +46,22 @@ public class DF {
 		return rec;
 	}
 
-	public static void removeAgents(Agent agent, AID name) {
+//	public static void removeAgents(Agent agent, AID name) {
+//		try {
+//			DFService.deregister(agent, name);
+//			System.out.println("remove success");
+//		} catch (FIPAException e) {
+//			System.err.println("Unable to remove agent " + name);
+//			e.printStackTrace();
+//		}
+//	}
+
+	public static void removeAgents(Agent agent) {
 		try {
-			DFService.deregister(agent, name);
+			DFService.deregister(agent);
+			System.out.println("remove success");
 		} catch (FIPAException e) {
-			System.err.println("Unable to remove agent " + name);
+			System.err.println("Unable to remove agent ");
 			e.printStackTrace();
 		}
 	}
