@@ -4,6 +4,7 @@ import DAO.DAOFactory;
 import Model.Constant;
 import Model.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jade.core.AID;
 import jade.core.Agent;
@@ -44,7 +45,7 @@ public class FriendsAgent extends Agent{
         } catch (IOException e) {
             e.printStackTrace();
         }
-        addBehaviour(new getReplyBehaviour());
+        addBehaviour(new waitMsgBehaviour());
     }
 
     private class sendInvitationBehaviour extends OneShotBehaviour {
@@ -71,30 +72,61 @@ public class FriendsAgent extends Agent{
         }
     }
 
-    private class getReplyBehaviour extends CyclicBehaviour {
+    private class waitMsgBehaviour extends CyclicBehaviour {
 
         @Override
         public void action() {
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
-            ACLMessage message = myAgent.receive(mt);
-
+            ACLMessage message = receive();
             if (message != null) {
-                if (message.getSender().getLocalName().equals(Constant.JADEGATEWAY_NAME)) {
-                    ObjectMapper mapper = new ObjectMapper();
-                    try {
-                        Map<String, Object> map = mapper.readValue(message.getContent(), Map.class);
-                        boolean s = (Boolean) map.get("success");
-                        ACLMessage result = new ACLMessage(ACLMessage.INFORM);
-                        result.addReceiver(MatchID);
-                        Map<String, Object> map2 = new HashMap<String, Object>();
-                        if (s) {
-                            map2.put("success", true);
-                        } else map2.put("success", false);
-                        String jsonStr = mapper.writeValueAsString(map);
-                        result.setContent(jsonStr);
-                        send(result);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                if (message.getSender().getLocalName().equals(Constant.ENVIRONEMENT_NAME)) {
+                    String content = null;
+                    switch(message.getPerformative()) {
+                        //get reply from env
+                        case ACLMessage.SUBSCRIBE:
+                            ObjectMapper mapper = new ObjectMapper();
+                            try {
+                                Map<String, Object> map = mapper.readValue(message.getContent(), Map.class);
+                                boolean s = (Boolean) map.get("success");
+                                ACLMessage result = new ACLMessage(ACLMessage.INFORM);
+                                result.addReceiver(MatchID);
+                                Map<String, Object> map2 = new HashMap<String, Object>();
+                                if (s) {
+                                    map2.put("success", true);
+                                } else map2.put("success", false);
+                                String jsonStr = mapper.writeValueAsString(map);
+                                result.setContent(jsonStr);
+                                send(result);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            break;
+
+                        //get friend list
+                        case ACLMessage.REQUEST:
+//                            content = message.getContent();
+//                            try {
+//                                JsonNode rootNode = mapper.readTree(content); // read Json
+//                                String email = rootNode.path("email").asText();
+//
+//                                //get friends
+//
+//                                reply = message.createReply();
+//                                map.put("user",user.toJSON());
+//                                String jsonStr = mapper.writeValueAsString(map);
+//                                reply.setContent(jsonStr);
+//
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                                reply = message.createReply();
+//                                String jsonStr = "{\"success\" : false }";
+//                                reply.setContent(jsonStr);
+//                            }
+//                            send(reply);
+                            break;
+
+                        //add friend
+                        case ACLMessage.PROPOSE:
+                            break;
                     }
                 }
             }
