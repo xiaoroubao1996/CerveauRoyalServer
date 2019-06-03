@@ -56,7 +56,7 @@ public class SMAServlet  extends HttpServlet {
                 out.close();
                 break;
             case("match"):
-                if(!isSameRequestAsLastOne(JSON)){
+//                if(!isSameRequestAsLastOne(JSON)){
                     out = response.getWriter();
                     Logger logger = Logger.getLogger(SMAServlet.class.getName());
                     logger.warning(JSON);
@@ -66,10 +66,10 @@ public class SMAServlet  extends HttpServlet {
                     out.println(behaviour.answer);
                     out.flush();
                     out.close();
-                }else{
-                    response.sendError(response.SC_ACCEPTED, "same request");
-                }
-                break;
+//                }else{
+//                    response.sendError(response.SC_ACCEPTED, "same request");
+//                }
+//                break;
         }
     }
 

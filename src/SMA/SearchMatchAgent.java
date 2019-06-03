@@ -58,9 +58,6 @@ public class SearchMatchAgent extends Agent {
 			MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
 			ACLMessage message = myAgent.receive(mt);
 			if (message != null) {
-				Logger logger = Logger.getLogger(SearchMatchAgent.class.getName());
-		        logger.warning(message.getContent());
-		        logger.warning("MyMessage from mySearchMatch!");
 
 				ACLMessageFromEnv = message;
 				ObjectMapper mapper = new ObjectMapper();

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import DAO.DAOFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -210,11 +211,11 @@ public class MatchAgent extends Agent {
 					}
 
 					if (message1 != null && message2 != null) {
-						msgJson = message1.getContent();
-						checkMsg(msgJson);
+						//msgJson = message1.getContent();
+						//checkMsg(msgJson);
 
-						msgJson = message2.getContent();
-						checkMsg(msgJson);
+						//msgJson = message2.getContent();
+						//checkMsg(msgJson);
 						step++;
 						break;
 					} else {
@@ -244,6 +245,11 @@ public class MatchAgent extends Agent {
 //				m.setContent("{\"id\":\""+user2.getId()+
 //						"\", \"roomId\": \""+matchId+"\",\"score\":\""+user1Score+"\", \"choice\": \""+user1Res+"\"}");
 				m.setContent(newMessageContent);
+				Logger logger = Logger.getLogger(MatchAgent.class.getName());
+				logger.warning(newMessageContent);
+				logger.warning(message1.getConversationId());
+
+				logger.warning("MyNewMessage from myMatchAgent!");
 				myAgent.send(m);
 
 				//To user2
@@ -255,6 +261,10 @@ public class MatchAgent extends Agent {
 				newMessageContent = newMessageContent.substring(0,newMessageContent.length() - 1); // delete "}"
 				newMessageContent = newMessageContent + ", \"stop\": " + stop + "}";
 				m.setContent(newMessageContent);
+				logger.warning(newMessageContent);
+
+				logger.warning(message1.getConversationId());
+				logger.warning("MyNewMessage from myMatchAgent!");
 				myAgent.send(m);
 
 				iterator++;
@@ -262,7 +272,7 @@ public class MatchAgent extends Agent {
                 user2Res = 0;
                 message1 = null;
                 message2 = null;
-                endTime = System.currentTimeMillis() + 20000;
+                endTime = System.currentTimeMillis() + Constant.MATCH_EACH_ROUND_TIME_MAX;
                 step = 0;
 				break;
 			}
@@ -275,12 +285,12 @@ public class MatchAgent extends Agent {
 			try {
 				rootNode = mapper.readTree(msg);
 				//{UserId: xxx, Option: 2, Score: xxx}
-				if(rootNode.path("UserId").asInt() == user1.getId()) {
+				if(rootNode.path("id").asInt() == user1.getId()) {
 					user1Res = rootNode.path("Option").asInt();
-					user1Score = rootNode.path("Score").asInt();
+					user1Score = rootNode.path("score").asInt();
 				}else {
 					user2Res = rootNode.path("Option").asInt();
-					user2Score = rootNode.path("Score").asInt();
+					user2Score = rootNode.path("score").asInt();
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
