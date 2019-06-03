@@ -471,6 +471,7 @@ public class MatchAgent extends Agent {
             MessageToReplyUser1.setContent(jsonString);
             send(MessageToReplyUser1);
 			myAgent.doDelete();
+			DF.removeAgents(myAgent);
 		}
 	}
 
