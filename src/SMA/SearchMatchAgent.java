@@ -8,6 +8,7 @@ import SMA.MatchAgent;
 import Listener.ServletContextJade;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.mysql.cj.x.protobuf.MysqlxExpr;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
@@ -123,10 +124,20 @@ public class SearchMatchAgent extends Agent {
 
 		@Override
 		public void action() {
-			ACLMessage message = new ACLMessage(ACLMessage.SUBSCRIBE);
-			message.addReceiver(new AID(Constant.FRIEND_NAME, AID.ISLOCALNAME));
-			message.setContent(generateDataJson(user, withUser, userId, newMatchAID));
-			send(message);
+			JadeModel jadeModel = new JadeModel();
+			String sjson =  generateDataJson(user, withUser, userId, newMatchAID);
+			List<String> params = new ArrayList<String>();
+			params.add(sjson);
+
+			try {
+				jadeModel.getContainer().createNewAgent(Constant.FRIEND_NAME, "SMA.FriendsAgent", params.toArray(new String[params.size()])).start();
+			} catch (StaleProxyException e) {
+				e.printStackTrace();
+			}
+			//ACLMessage message = new ACLMessage(ACLMessage.SUBSCRIBE);
+			//message.addReceiver(new AID(Constant.FRIEND_NAME, AID.ISLOCALNAME));
+			//message.setContent(generateDataJson(user, withUser, userId, newMatchAID));
+			//send(message);
 		}
 
 		@Override
