@@ -49,7 +49,7 @@ public class SMAServlet  extends HttpServlet {
 
             case("friends"):
                 out = response.getWriter();
-                behaviour = new ProcessBehaviour(JSON, Constant.USER_INFO_NAME, Constant.SMA_GET);
+                behaviour = new ProcessBehaviour(JSON, Constant.FRIEND_NAME, Constant.SMA_GET);
                 activeAgent(behaviour);
                 out.println(behaviour.answer);
                 out.flush();
@@ -64,6 +64,7 @@ public class SMAServlet  extends HttpServlet {
                 out.flush();
                 out.close();
                 break;
+
             case("match"):
 //                if(!isSameRequestAsLastOne(JSON)){
                     out = response.getWriter();
@@ -78,7 +79,7 @@ public class SMAServlet  extends HttpServlet {
 //                }else{
 //                    response.sendError(response.SC_ACCEPTED, "same request");
 //                }
-//                break;
+                break;
         }
     }
 
@@ -108,6 +109,16 @@ public class SMAServlet  extends HttpServlet {
                 out.flush();
                 out.close();
                 break;
+
+            case("friends"):
+                out = response.getWriter();
+                behaviour = new ProcessBehaviour(JSON, Constant.FRIEND_NAME, Constant.SMA_POST);
+                activeAgent(behaviour);
+                out.println(behaviour.answer);
+                out.flush();
+                out.close();
+                break;
+
             case("match"):
 //                if(!isSameRequestAsLastOne(JSON)){
                     out = response.getWriter();

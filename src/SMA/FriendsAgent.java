@@ -2,6 +2,7 @@ package SMA;
 
 import DAO.DAOFactory;
 import Model.Constant;
+import Model.Friends;
 import Model.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -14,10 +15,15 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import com.google.android.gcm.server.*;
 import com.google.android.gcm.server.Message;
+import sun.awt.Symbol;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import static DAO.DAOFactory.getFriendDAO;
 
 public class FriendsAgent extends Agent{
 
@@ -35,16 +41,16 @@ public class FriendsAgent extends Agent{
         friend = null;
         deviceToken = null;
         ObjectMapper mapper = new ObjectMapper();
-        try {
-            Map<String, Object> map = mapper.readValue((String) getArguments()[0], Map.class);
-            Integer idFriend = (Integer) map.get("userId");
-            friend = DAOFactory.getUserDAO().selectByID(idFriend);
-            MatchID = new AID((String) map.get("matchAgent"), AID.ISLOCALNAME);
-            System.out.println("Got aid de match :" +  MatchID);
-            if (friend != null) addBehaviour(new sendInvitationBehaviour());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Map<String, Object> map = mapper.readValue((String) getArguments()[0], Map.class);
+//            Integer idFriend = (Integer) map.get("userId");
+//            friend = DAOFactory.getUserDAO().selectByID(idFriend);
+//            MatchID = new AID((String) map.get("matchAgent"), AID.ISLOCALNAME);
+//            System.out.println("Got aid de match :" +  MatchID);
+//            if (friend != null) addBehaviour(new sendInvitationBehaviour());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         addBehaviour(new waitMsgBehaviour());
     }
 
@@ -80,10 +86,11 @@ public class FriendsAgent extends Agent{
             if (message != null) {
                 if (message.getSender().getLocalName().equals(Constant.ENVIRONEMENT_NAME)) {
                     String content = null;
+                    ObjectMapper mapper = new ObjectMapper();
+                    ACLMessage reply = null;
                     switch(message.getPerformative()) {
                         //get reply from env
                         case ACLMessage.SUBSCRIBE:
-                            ObjectMapper mapper = new ObjectMapper();
                             try {
                                 Map<String, Object> map = mapper.readValue(message.getContent(), Map.class);
                                 boolean s = (Boolean) map.get("success");
@@ -103,32 +110,77 @@ public class FriendsAgent extends Agent{
 
                         //get friend list
                         case ACLMessage.REQUEST:
-//                            content = message.getContent();
-//                            try {
-//                                JsonNode rootNode = mapper.readTree(content); // read Json
-//                                String email = rootNode.path("email").asText();
-//
-//                                //get friends
-//
-//                                reply = message.createReply();
-//                                map.put("user",user.toJSON());
-//                                String jsonStr = mapper.writeValueAsString(map);
-//                                reply.setContent(jsonStr);
-//
-//                            } catch (IOException e) {
-//                                e.printStackTrace();
-//                                reply = message.createReply();
-//                                String jsonStr = "{\"success\" : false }";
-//                                reply.setContent(jsonStr);
-//                            }
-//                            send(reply);
+                            content = message.getContent();
+                            reply = message.createReply();
+                            try {
+                                JsonNode rootNode = mapper.readTree(content); // read Json
+                                int userId = rootNode.path("id").asInt();
+                                //get friends
+
+                                ArrayList<Friends> friends = DAOFactory.getFriendDAO().selectByUserID(userId);
+                                ArrayList<User> userList = new ArrayList<>();
+                                for(Friends friend :  friends){
+                                    userList.add(DAOFactory.getUserDAO().selectByID(friend.getUser2Id()));
+                                }
+                                Map<String, Object> map = new HashMap<String, Object>();
+                                String jsonStr = mapper.writeValueAsString(userList);
+                                map.put("success",true);
+                                map.put("friends",jsonStr);
+                                jsonStr = mapper.writeValueAsString(map);
+                                reply.setContent(jsonStr);
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                reply = message.createReply();
+                                String jsonStr = "{\"success\" : false }";
+                                reply.setContent(jsonStr);
+                            }
+                            send(reply);
                             break;
 
                         //add friend
                         case ACLMessage.PROPOSE:
+                            content = message.getContent();
+                            reply = message.createReply();
+                            try {
+                                JsonNode rootNode = mapper.readTree(content); // read Json
+                                int userId = rootNode.path("id").asInt();
+                                String email = rootNode.path("email").asText();
+                                //get friends
+                                User user1 = DAOFactory.getUserDAO().selectByID(userId);
+                                User user2 = DAOFactory.getUserDAO().selectByEmail(email);
+                                if(user1!= null && user2 != null) {
+                                    Friends friend = new Friends(user1, user2);
+                                    if (DAOFactory.getFriendDAO().add(friend)) {
+                                        ArrayList<Friends> friends = DAOFactory.getFriendDAO().selectByUserID(userId);
+                                        ArrayList<User> userList = new ArrayList<>();
+                                        for(Friends newFriend :  friends){
+                                            userList.add(DAOFactory.getUserDAO().selectByID(newFriend.getUser2Id()));
+                                        }
+                                        Map<String, Object> map = new HashMap<String, Object>();
+                                        String jsonStr = mapper.writeValueAsString(userList);
+                                        map.put("success",true);
+                                        map.put("friends",jsonStr);
+                                        jsonStr = mapper.writeValueAsString(map);
+                                        reply.setContent(jsonStr);
+                                    }
+                                }else{
+                                    String jsonStr = "{\"success\" : false }";
+                                    reply.setContent(jsonStr);
+                                }
+                            } catch (IOException e) {
+                                String jsonStr = "{\"success\" : false }";
+                                reply.setContent(jsonStr);
+                            } catch (SQLException e) {
+                                String jsonStr = "{\"success\" : false }";
+                                reply.setContent(jsonStr);
+                            }
+                            send(reply);
                             break;
                     }
                 }
+            }else{
+                block();
             }
         }
     }

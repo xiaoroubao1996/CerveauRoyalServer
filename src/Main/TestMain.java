@@ -27,6 +27,7 @@ public class TestMain {
             jadeModel.getContainer().createNewAgent(Constant.ENVIRONEMENT_NAME, "SMA.EnvTestAgent",null).start();
             jadeModel.getContainer().createNewAgent(Constant.USER_INFO_NAME, "SMA.UserInfoAgent",null).start();
             jadeModel.getContainer().createNewAgent(Constant.QUESTION_NAME, "SMA.QuestionAgent",null).start();
+            jadeModel.getContainer().createNewAgent(Constant.FRIEND_NAME, "SMA.FriendsAgent",null).start();
             System.out.println("Jade initialized");
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -39,7 +39,7 @@ public class EnvTestAgent extends Agent{
                     messageToSMA.setConversationId(message.getConversationId());
                     send(messageToSMA);
                     System.out.println(message.getContent());
-//                        step++;
+                        step++;
                     }else{
                         block();
                     }

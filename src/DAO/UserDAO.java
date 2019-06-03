@@ -67,7 +67,7 @@ public class UserDAO {
         try {
             conn = SQL.getSQLConnection();
             String sql;
-            sql = "SELECT * FROM User WHERE id= (?) ";
+            sql = "SELECT * FROM User WHERE id= ? ";
             sqlPrepare=conn.prepareStatement(sql);
 
             sqlPrepare.setInt(1,id);

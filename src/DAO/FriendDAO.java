@@ -47,45 +47,52 @@ public class FriendDAO {
         try {
             conn = SQL.getSQLConnection();
             String sql;
-            sql = "SELECT * FROM Friend WHERE id=  ";
+            sql = "SELECT * FROM Friend WHERE id= ? ";
             sqlPrepare=conn.prepareStatement(sql);
 
-            sqlPrepare.setInt(1,id);
+            sqlPrepare.setInt(1,userId);
             result = sqlPrepare.executeQuery();
+            Friends friends;
             while (result.next()) {
-                user = new User(result.getInt("id"),
-                        result.getString("email"),
-                        result.getString("nickname"),
-                        result.getInt("avatar"),
-                        result.getString("password"),
-                        result.getInt("score"),
-                        result.getInt("numWinLiterature"),
-                        result.getInt("numLoseLiterature"),
-                        result.getInt("numWinMath"),
-                        result.getInt("numLoseMath"),
-                        result.getInt("numWinArt"),
-                        result.getInt("numLoseArt"),
-                        result.getInt("numWinHistory"),
-                        result.getInt("numLoseHistory"),
-                        result.getInt("numWinMusic"),
-                        result.getInt("numLoseMusic"),
-                        result.getInt("numWinGeography"),
-                        result.getInt("numLoseGeography"),
-                        result.getInt("numWinEnglish"),
-                        result.getInt("numLoseEnglish"),
-                        result.getInt("numWinCommonsense"),
-                        result.getInt("numLoseCommonsense"),
-                        result.getString("deviceToken"),
-                        result.getString("rank")
+                friends = new Friends(result.getInt("id"),
+                        result.getInt("User1Id"),
+                        result.getInt("User2Id")
                 );
+                resultList.add(friends);
             }
             conn.close();
-            return user;
+            return resultList;
         } catch (SQLException se) {
             se.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return resultList;
+    }
+
+    public boolean add(Friends friends) throws SQLException {
+        Connection conn = null;
+        PreparedStatement sqlPrepare;
+        try {
+            conn = SQL.getSQLConnection();
+
+            String sql;
+            sql = "INSERT INTO Friend (User1Id, User2Id) VALUES (?,?)";
+
+            sqlPrepare=conn.prepareStatement(sql);
+            sqlPrepare.setInt(1,friends.getUser1Id());
+            sqlPrepare.setInt(2,friends.getUser2Id());
+
+            sqlPrepare.executeUpdate();
+
+
+            conn.close();
+            return true;
+        } catch (SQLException se) {
+            throw se;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
