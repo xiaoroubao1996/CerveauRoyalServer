@@ -47,6 +47,15 @@ public class SMAServlet  extends HttpServlet {
                 out.close();
                 break;
 
+            case("friends"):
+                out = response.getWriter();
+                behaviour = new ProcessBehaviour(JSON, Constant.USER_INFO_NAME, Constant.SMA_GET);
+                activeAgent(behaviour);
+                out.println(behaviour.answer);
+                out.flush();
+                out.close();
+                break;
+
             case("login"):
                 out = response.getWriter();
                 behaviour = new ProcessBehaviour(JSON, Constant.USER_INFO_NAME, Constant.SMA_SUBSCRIBE);

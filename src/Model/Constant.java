@@ -22,7 +22,8 @@ public class Constant {
 
 
     //String
-    public static final String JADEGATEWAY_NAME = "ControlContainer-1@cerveauroyal";
+//    public static final String JADEGATEWAY_NAME = "ControlContainer-1@cerveauroyal";
+    public static final String JADEGATEWAY_NAME = "ControlContainer-1";
     public static final String ENVIRONEMENT_NAME = "environementAgent";
     public static final String SEARCH_MATCH_NAME = "searchMatchAgent";
     public static final String USER_INFO_NAME = "userInfoAgent";
