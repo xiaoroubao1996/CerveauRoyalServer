@@ -60,7 +60,7 @@ public class MatchAgent extends Agent {
 		String matchLevel = String.valueOf(user1.getRank());
 
 		// register this MatchAgent into the DF
-		DF.registerAgent(this, String.valueOf(matchSubject), matchLevel);
+//		DF.registerAgent(this, String.valueOf(matchSubject), matchLevel);
         matchId = this.getLocalName();
         
 		// The main behaviour in this Agent
