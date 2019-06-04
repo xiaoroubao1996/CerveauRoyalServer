@@ -51,15 +51,16 @@ public class SearchMatchAgent extends Agent {
 		userId = 0;
 
 	
-		ParallelBehaviour waitMsgBehaviour = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
+//		ParallelBehaviour waitMsgBehaviour = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
+//
+//		WaitCancelGameMsgBehaviour waitCancelGameMsgBehaviour = new WaitCancelGameMsgBehaviour();
+//		waitMsgBehaviour.addSubBehaviour(waitCancelGameMsgBehaviour);
+//
+//		WaitStartGameMsgBehaviour waitStartGameMsgBehaviour = new WaitStartGameMsgBehaviour();
+//		waitMsgBehaviour.addSubBehaviour(waitStartGameMsgBehaviour);
 		
-		WaitCancelGameMsgBehaviour waitCancelGameMsgBehaviour = new WaitCancelGameMsgBehaviour();
-		waitMsgBehaviour.addSubBehaviour(waitCancelGameMsgBehaviour);
-		
-		WaitStartGameMsgBehaviour waitStartGameMsgBehaviour = new WaitStartGameMsgBehaviour();
-		waitMsgBehaviour.addSubBehaviour(waitStartGameMsgBehaviour);
-		
-		addBehaviour(waitMsgBehaviour);
+		addBehaviour(new WaitCancelGameMsgBehaviour());
+		addBehaviour(new WaitStartGameMsgBehaviour());
 
 	}
 
@@ -76,8 +77,8 @@ public class SearchMatchAgent extends Agent {
 
 		@Override
 		public void action() {
-			String userId = "";
-			String subject = "";
+			int userId = 0;
+			int subject = 0;
 			String rank = "";
 			MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
 			ACLMessage message = myAgent.receive(mt);
@@ -90,8 +91,8 @@ public class SearchMatchAgent extends Agent {
 				// read Json
 				try {
 					rootNode = mapper.readTree(message.getContent());
-					userId = rootNode.path("id").asText();
-					subject = rootNode.path("subject").asText();
+					userId = rootNode.path("id").asInt();
+					subject = rootNode.path("subject").asInt();
 					rank = rootNode.path("rank").asText();
 				} catch (IOException e) {
 					e.printStackTrace();
