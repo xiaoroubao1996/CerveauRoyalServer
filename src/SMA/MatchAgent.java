@@ -60,7 +60,11 @@ public class MatchAgent extends Agent {
 		String matchLevel = String.valueOf(user1.getRank());
 
 		// register this MatchAgent into the DF
-//		DF.registerAgent(this, String.valueOf(matchSubject), matchLevel);
+		DF.registerAgent(this, 
+				String.valueOf(matchSubject), 
+				matchLevel,
+				String.valueOf(user1.getId())
+				);
         matchId = this.getLocalName();
         
 		// The main behaviour in this Agent
@@ -90,6 +94,11 @@ public class MatchAgent extends Agent {
 		//end 1.2
 		waitSecondUserParllelBehaivour.addSubBehaviour(deleteOutOfTimeBehaviour);
 
+		//start 1.3
+		FirstUserCancelBehaviour firstUserCancelBehaviour = new FirstUserCancelBehaviour();
+		//end 1.3
+		waitSecondUserParllelBehaivour.addSubBehaviour(firstUserCancelBehaviour);
+		
 		//end 1
 		MatchSequentialBehaviour.addSubBehaviour(waitSecondUserParllelBehaivour);
 
@@ -457,6 +466,48 @@ public class MatchAgent extends Agent {
 			return done;
 		}
 	}
+	
+	private class FirstUserCancelBehaviour extends Behaviour{
+
+		boolean done = false;
+
+		@Override
+		public void action() {
+			
+			MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+					MessageTemplate.MatchSender(new AID(Constant.SEARCH_MATCH_NAME, AID.ISLOCALNAME)));
+			
+			ACLMessage message = myAgent.receive(mt);
+			 
+			if (message != null) {
+				System.out.println(myAgent.getLocalName() + "--> getCancelRequest ");
+
+				ACLMessage replyToCancelRequest = message.createReply();
+				
+				String replyToStartGame = "{\"success\": false}";
+				MessageToReplyUser1.setContent(replyToStartGame);
+		        send(MessageToReplyUser1);
+				
+		        String replyToCancelGame = "{\"success\": true}";
+		        replyToCancelRequest.setContent(replyToCancelGame);
+		        send(replyToCancelRequest);
+		        
+		        
+				DF.removeAgents(myAgent);
+				myAgent.doDelete();
+				
+				done = true;
+			}else {
+				block();
+			}
+		}
+		
+		@Override
+		public boolean done() {
+			return done;
+		}
+		
+	}
 
 	private class DeleteOutOfTimeBehaviour extends WakerBehaviour {
 
@@ -470,8 +521,10 @@ public class MatchAgent extends Agent {
             String jsonString = "{\"success\": false}";
             MessageToReplyUser1.setContent(jsonString);
             send(MessageToReplyUser1);
-			myAgent.doDelete();
+
+            //delete this room 
 			DF.removeAgents(myAgent);
+			myAgent.doDelete();
 		}
 	}
 
