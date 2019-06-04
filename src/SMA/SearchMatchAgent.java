@@ -168,7 +168,7 @@ public class SearchMatchAgent extends Agent {
 							DF.findAgents(myAgent, 
 									String.valueOf(subject), 
 									String.valueOf(user.getRank()),
-									String.valueOf(null)
+									null
 							));
 					// if we find a match
 					if (matches.size() > 0) {

@@ -52,15 +52,15 @@ public class DF {
 		sdRank.setType("rank");
 		sdRank.setName(nameRank);
 		template.addServices(sdRank);
-		
 
-		//we don't need a service name for searches, just the type
-		ServiceDescription sdUserId = new ServiceDescription();
-		sdUserId.setType("userId");
 		if(nameUserId != null) {
+			//we don't need a service name for searches, just the type
+			ServiceDescription sdUserId = new ServiceDescription();
+			sdUserId.setType("userId");
 			sdUserId.setName(nameUserId);
+			template.addServices(sdUserId);
 		}
-		template.addServices(sdUserId);
+
 		
 		DFAgentDescription[] result;
 		try {
