@@ -14,7 +14,8 @@ import java.sql.SQLOutput;
 public class EnvAgent extends Agent{
 	protected void setup() {
         System.out.println(getLocalName()+ "--> Installed");
-        DF.registerAgent(this, Constant.ENVIRONEMENT_NAME, getLocalName());
+        //registerAgent(Agent agent, String nameSubject, String nameRank, String nameUserId)
+        DF.registerAgent(this, Constant.ENVIRONEMENT_NAME, getLocalName(),"");
         addBehaviour(new EnvBehaviour());
 	}
 
