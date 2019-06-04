@@ -36,7 +36,7 @@ public class FriendsAgent extends Agent{
 
     protected void setup() {
         System.out.println(getLocalName()+ "--> Installed");
-        DF.registerAgent(this, Constant.FRIEND_NAME, getLocalName());
+        DF.registerAgent(this, Constant.FRIEND_NAME, getLocalName(),"");
 
         friend = null;
         deviceToken = null;

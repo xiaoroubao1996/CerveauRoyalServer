@@ -9,7 +9,7 @@ import jade.lang.acl.MessageTemplate;
 public class EnvTestAgent extends Agent{
 	protected void setup() {
         System.out.println(getLocalName()+ "--> Installed");
-        DF.registerAgent(this, Constant.ENVIRONEMENT_NAME, getLocalName());
+        DF.registerAgent(this, Constant.ENVIRONEMENT_NAME, getLocalName(),"");
         addBehaviour(new EnvBehaviour());
 	}
 

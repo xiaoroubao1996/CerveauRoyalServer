@@ -9,5 +9,8 @@
 	<classpathentry kind="lib" path="lib/jackson-databind-2.9.4.jar"/>
 	<classpathentry kind="lib" path="lib/jade4.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-8.0.16.jar"/>
+	<classpathentry kind="lib" path="lib/gcm.server.jar"/>
+	<classpathentry kind="lib" path="lib/gcm-server-1.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/gcm.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -21,7 +21,7 @@ public class QuestionAgent extends Agent {
 
     protected void setup() {
         System.out.println(getLocalName()+ "--> Installed");
-        DF.registerAgent(this, Constant.QUESTION_NAME, getLocalName());
+        DF.registerAgent(this, Constant.QUESTION_NAME, getLocalName(),"");
         addBehaviour(new waitMsgBehaviour());
     }
 

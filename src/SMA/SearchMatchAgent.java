@@ -39,7 +39,7 @@ public class SearchMatchAgent extends Agent {
 
 	protected void setup() {
 		System.out.println(getLocalName() + "--> Installed");
-		DF.registerAgent(this, Constant.SEARCH_MATCH_NAME, getLocalName());
+		DF.registerAgent(this, Constant.SEARCH_MATCH_NAME, getLocalName(),"");
 
 		// initialization
 		user = null;
@@ -88,7 +88,11 @@ public class SearchMatchAgent extends Agent {
 				} else {
 					// GET match
 					ArrayList<AID> matches = new ArrayList<AID>(
-							DF.findAgents(myAgent, String.valueOf(subject), String.valueOf(user.getRank())));
+							DF.findAgents(myAgent, 
+									String.valueOf(subject), 
+									String.valueOf(user.getRank()),
+									String.valueOf(null)
+							));
 					// if we find a match
 					if (matches.size() > 0) {
 						addBehaviour(new getMatchBehaviour(matches.get(0)));
