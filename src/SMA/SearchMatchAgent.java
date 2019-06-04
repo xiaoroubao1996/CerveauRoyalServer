@@ -5,7 +5,6 @@ import Model.Constant;
 import Model.JadeModel;
 import Model.User;
 import SMA.MatchAgent;
-import SMA.MatchAgent.WaitSecondUserBehaivour;
 import Listener.ServletContextJade;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
