@@ -45,8 +45,8 @@ public class QuestionAgent extends Agent {
 
                     questions = DAOFactory.getQuestionDAO().selectBySubject(subject);
 
-                    //TODO random 10 question
-//                    questions = randomQuestion(questions);
+                    //get 10 random question
+                    questions = getRandomQuestion(questions);
 
                     jsonStr = mapper.writeValueAsString(questions);
                 } catch (IOException e) {
@@ -60,6 +60,39 @@ public class QuestionAgent extends Agent {
             } else
                 block();
         }
+    }
+
+    //get n random num(no same num)
+    private int[] randomCommon(int min, int max, int n){
+        if (n > (max - min + 1) || max < min) {
+            return null;
+        }
+        int[] result = new int[n];
+        int count = 0;
+        while(count < n) {
+            int num = (int) (Math.random() * (max - min)) + min;
+            boolean flag = true;
+            for (int j = 0; j < n; j++) {
+                if(num == result[j]){
+                    flag = false;
+                    break;
+                }
+            }
+            if(flag){
+                result[count] = num;
+                count++;
+            }
+        }
+        return result;
+    }
+
+    private ArrayList<Question> getRandomQuestion(ArrayList<Question> allQestions){
+        int[] num10Questions = randomCommon(0, allQestions.size(), 10);
+        ArrayList<Question> newQuestions = new ArrayList<>();
+        for(int i : num10Questions){
+            newQuestions.add(allQestions.get(i));
+        }
+        return newQuestions;
     }
 
 }

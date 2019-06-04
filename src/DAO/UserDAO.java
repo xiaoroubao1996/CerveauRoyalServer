@@ -220,9 +220,9 @@ public class UserDAO {
             sqlPrepare.setInt(16,user.getNumWinGeography());
             sqlPrepare.setInt(17,user.getNumLoseGeography());
             sqlPrepare.setInt(18,user.getNumWinEnglish());
-            sqlPrepare.setInt(19,user.getNumWinCommonsense());
-            sqlPrepare.setInt(20,user.getNumLoseCommonsense());
-            sqlPrepare.setInt(21,user.getNumWinEnglish());
+            sqlPrepare.setInt(19,user.getNumLoseEnglish());
+            sqlPrepare.setInt(20,user.getNumWinCommonsense());
+            sqlPrepare.setInt(21,user.getNumLoseCommonsense());
             sqlPrepare.setString(22,user.getDeviceToken());
             sqlPrepare.setString(23,String.valueOf(user.getRank()));
             sqlPrepare.setInt(24,user.getId());
