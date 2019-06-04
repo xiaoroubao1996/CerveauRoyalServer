@@ -5,6 +5,7 @@ import Model.Constant;
 import Model.JadeModel;
 import Model.User;
 import SMA.MatchAgent;
+import SMA.MatchAgent.WaitSecondUserBehaivour;
 import Listener.ServletContextJade;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -14,6 +15,7 @@ import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.ParallelBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -49,10 +51,86 @@ public class SearchMatchAgent extends Agent {
 		withUser = false;
 		userId = 0;
 
-		addBehaviour(new waitMsgBehaviour());
+	
+		ParallelBehaviour waitMsgBehaviour = new ParallelBehaviour(ParallelBehaviour.WHEN_ALL);
+		
+		WaitCancelGameMsgBehaviour waitCancelGameMsgBehaviour = new WaitCancelGameMsgBehaviour();
+		waitMsgBehaviour.addSubBehaviour(waitCancelGameMsgBehaviour);
+		
+		WaitStartGameMsgBehaviour waitStartGameMsgBehaviour = new WaitStartGameMsgBehaviour();
+		waitMsgBehaviour.addSubBehaviour(waitStartGameMsgBehaviour);
+		
+		addBehaviour(waitMsgBehaviour);
+
 	}
 
-	private class waitMsgBehaviour extends CyclicBehaviour {
+
+/**
+* client click cancel to send the cancel request 
+* first of all, cancel request send to env agent
+* but before this 
+* user havent got the reply of first request 
+* so the user havent has the aid of this room
+* we need to find the destinatire of this message from DF
+ **/	
+	private class WaitCancelGameMsgBehaviour extends CyclicBehaviour{
+
+		@Override
+		public void action() {
+			String userId = "";
+			String subject = "";
+			String rank = "";
+			MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+			ACLMessage message = myAgent.receive(mt);
+			if (message != null) {
+				
+				ACLMessageFromEnv = message;
+				
+				ObjectMapper mapper = new ObjectMapper();
+				JsonNode rootNode = null;
+				// read Json
+				try {
+					rootNode = mapper.readTree(message.getContent());
+					userId = rootNode.path("id").asText();
+					subject = rootNode.path("subject").asText();
+					rank = rootNode.path("rank").asText();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+				//search room to whom we should send the cancel message 
+				ArrayList<AID> matches = new ArrayList<AID>(
+						DF.findAgents(myAgent, 
+								String.valueOf(subject), 
+								String.valueOf(rank),
+								String.valueOf(userId)
+						));
+				// if we find a match transfer the message
+				if (matches.size() > 0) {
+					ACLMessage messageToMatch = new ACLMessage(ACLMessage.INFORM);
+					//message.addReceiver(matches.get(0));
+					messageToMatch.addReceiver(new AID(matches.get(0).getName(), AID.ISLOCALNAME));
+					messageToMatch.addReplyTo(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME));
+					messageToMatch.setConversationId(ACLMessageFromEnv.getConversationId());
+					//TODO:
+					messageToMatch.setContent("");
+					send(messageToMatch);
+										
+				} else {
+					ACLMessage erreurMsg = message.createReply();
+					erreurMsg.setContent("{\"success\": false}");
+					send(erreurMsg);
+				}
+				
+				
+			} else {
+				block();
+			}
+		}
+		
+	}
+	
+	private class WaitStartGameMsgBehaviour extends CyclicBehaviour {
 
 		@Override
 		public void action() {
