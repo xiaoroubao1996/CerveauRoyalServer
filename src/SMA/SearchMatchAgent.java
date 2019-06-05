@@ -213,15 +213,10 @@ public class SearchMatchAgent extends Agent {
 			List<String> params = new ArrayList<String>();
 			params.add(sjson);
 
-			try {
-				jadeModel.getContainer().createNewAgent(Constant.FRIEND_NAME, "SMA.FriendsAgent", params.toArray(new String[params.size()])).start();
-			} catch (StaleProxyException e) {
-				e.printStackTrace();
-			}
-			//ACLMessage message = new ACLMessage(ACLMessage.SUBSCRIBE);
-			//message.addReceiver(new AID(Constant.FRIEND_NAME, AID.ISLOCALNAME));
-			//message.setContent(generateDataJson(user, withUser, userId, newMatchAID));
-			//send(message);
+			ACLMessage message = new ACLMessage(ACLMessage.SUBSCRIBE);
+			message.addReceiver(new AID(Constant.FRIEND_NAME, AID.ISLOCALNAME));
+			message.setContent(generateDataJson(user, withUser, userId, newMatchAID));
+			send(message);
 		}
 
 		@Override
