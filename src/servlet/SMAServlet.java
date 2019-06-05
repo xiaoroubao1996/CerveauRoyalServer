@@ -136,6 +136,35 @@ public class SMAServlet  extends HttpServlet {
         }
     }
 
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // TODO Auto-generated method stub
+//		super.doDelete(req, resp);
+        String url = request.getRequestURI();
+
+        String JSON = request.getParameter("JSON");
+
+        int lastIndex = url.lastIndexOf("/");
+        String urlREST = url.substring(lastIndex + 1);
+        response.setContentType("text/html;charset=utf-8");
+        PrintWriter out = null;
+        ProcessBehaviour behaviour = null;
+        JsonNode rootNode = null;
+        ObjectMapper mapper = new ObjectMapper();
+
+        switch (urlREST) {
+            case ("cancelMatch"):
+                out = response.getWriter();
+                behaviour = new ProcessBehaviour(JSON, Constant.SEARCH_MATCH_NAME, Constant.SMA_PUT);
+                activeAgent(behaviour);
+                out.println(behaviour.answer);
+                out.flush();
+                out.close();
+                break;
+        }
+    }
+
     private void activeAgent(Behaviour behaviour) {
         try {
             JadeGateway.execute(behaviour);
