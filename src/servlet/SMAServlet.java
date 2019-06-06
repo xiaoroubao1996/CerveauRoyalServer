@@ -26,7 +26,6 @@ public class SMAServlet  extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // TODO Auto-generated method stub
 //		super.doDelete(req, resp);
         String url = request.getRequestURI();
 
@@ -37,6 +36,9 @@ public class SMAServlet  extends HttpServlet {
         response.setContentType("text/html;charset=utf-8");
         PrintWriter out = null;
         ProcessBehaviour behaviour = null;
+        JsonNode rootNode = null;
+        ObjectMapper mapper = new ObjectMapper();
+
         switch(urlREST){
             case("user"):
                 out = response.getWriter();
@@ -79,6 +81,19 @@ public class SMAServlet  extends HttpServlet {
 //                }else{
 //                    response.sendError(response.SC_ACCEPTED, "same request");
 //                }
+                break;
+            case("acceptInvitation"):
+                out = response.getWriter();
+                rootNode = mapper.readTree(JSON);
+                String matchId = rootNode.path("matchId").asText();
+                logger = Logger.getLogger(SMAServlet.class.getName());
+                logger.warning(JSON);
+                logger.warning("notitest in  servlet");
+                behaviour = new ProcessBehaviour(JSON, matchId, Constant.SMA_SUBSCRIBE);
+                activeAgent(behaviour);
+                out.println(behaviour.answer);
+                out.flush();
+                out.close();
                 break;
         }
     }

@@ -11,10 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.mysql.cj.x.protobuf.MysqlxExpr;
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.OneShotBehaviour;
-import jade.core.behaviours.ParallelBehaviour;
+import jade.core.behaviours.*;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
@@ -161,8 +158,10 @@ public class SearchMatchAgent extends Agent {
 				// if withFriend==true just need to create new agent.
 				// and inform the friendAgent
 				if (withUser == true && userId != 0) {
-					addBehaviour(new newMatchBehaviour());
-					addBehaviour(new informFriendAgentBehaviour());
+					SequentialBehaviour newMatchSequentialBehaviour = new SequentialBehaviour();
+					newMatchSequentialBehaviour.addSubBehaviour(new newMatchBehaviour());
+					newMatchSequentialBehaviour.addSubBehaviour(new informFriendAgentBehaviour());
+					addBehaviour(newMatchSequentialBehaviour);
 				} else {
 					// GET match
 					ArrayList<AID> matches = new ArrayList<AID>(
@@ -197,6 +196,7 @@ public class SearchMatchAgent extends Agent {
 			map.put("withUser", withUser);
 			map.put("userId", userId);
 			map.put("matchAgent", matchAID);
+			map.put("subject",subject);
 			jsonString = mapper.writeValueAsString(map);
 		} catch (JsonProcessingException e) {
 			// jsonString = "{\"success\": false}";
@@ -204,7 +204,7 @@ public class SearchMatchAgent extends Agent {
 		return jsonString;
 	}
 
-	private class informFriendAgentBehaviour extends Behaviour {
+	private class informFriendAgentBehaviour extends OneShotBehaviour {
 
 		@Override
 		public void action() {
@@ -217,11 +217,6 @@ public class SearchMatchAgent extends Agent {
 			message.addReceiver(new AID(Constant.FRIEND_NAME, AID.ISLOCALNAME));
 			message.setContent(generateDataJson(user, withUser, userId, newMatchAID));
 			send(message);
-		}
-
-		@Override
-		public boolean done() {
-			return true;
 		}
 	}
 

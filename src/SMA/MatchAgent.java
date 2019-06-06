@@ -254,11 +254,7 @@ public class MatchAgent extends Agent {
 //				m.setContent("{\"id\":\""+user2.getId()+
 //						"\", \"roomId\": \""+matchId+"\",\"score\":\""+user1Score+"\", \"choice\": \""+user1Res+"\"}");
 				m.setContent(newMessageContent);
-				Logger logger = Logger.getLogger(MatchAgent.class.getName());
-				logger.warning(newMessageContent);
-				logger.warning(message1.getConversationId());
 
-				logger.warning("MyNewMessage from myMatchAgent!");
 				myAgent.send(m);
 
 				//To user2
@@ -270,10 +266,7 @@ public class MatchAgent extends Agent {
 				newMessageContent = newMessageContent.substring(0,newMessageContent.length() - 1); // delete "}"
 				newMessageContent = newMessageContent + ", \"stop\": " + stop + "}";
 				m.setContent(newMessageContent);
-				logger.warning(newMessageContent);
 
-				logger.warning(message1.getConversationId());
-				logger.warning("MyNewMessage from myMatchAgent!");
 				myAgent.send(m);
 
 				iterator++;
@@ -413,18 +406,24 @@ public class MatchAgent extends Agent {
 			MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE);
 			ACLMessage message = myAgent.receive(mt);
 			if (message != null) {
-				System.out.println(myAgent.getLocalName() + "--> getRequest ");
+				System.out.println(myAgent.getLocalName() + "--> getSubscribe ");
+				Logger logger = Logger.getLogger(MatchAgent.class.getName());
+				logger.warning(message.getContent());
+				logger.warning("notitest");
 
-				if(withUser == true) {		
+				logger.warning("MyNewMessage from myMatchAgent!");
+				if(withUser) {
 					ObjectMapper mapper = new ObjectMapper();
 					JsonNode rootNode = null;
 					// read Json
 					try {
+						logger.warning("notitest in try");
 						rootNode = mapper.readTree(message.getContent());
-						Boolean success = rootNode.path("success").asBoolean();
+						boolean success = rootNode.path("success").asBoolean();
 						//case 1-1: play the game with an user and the user accept the request
-						if(success == true && opponentId != 0) {
+						if(success && opponentId != 0) {
 							//get the user2 into this room then goto get the questionDataBehaviour
+							logger.warning("notitest in success");
 							user2 = DAOFactory.getUserDAO().selectByID(opponentId);
 							MessageToReplyUser2 = message.createReply();
 							

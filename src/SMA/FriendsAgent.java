@@ -4,7 +4,6 @@ import DAO.DAOFactory;
 import Model.Constant;
 import Model.Friends;
 import Model.User;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jade.core.AID;
@@ -12,13 +11,13 @@ import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import net.sf.json.JSONObject;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.json.simple.JSONObject;
-import servlet.SMAServlet;
+//import org.json.simple.JSONObject;
 //import sun.awt.Symbol;
 
 import java.io.IOException;
@@ -27,15 +26,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static DAO.DAOFactory.getFriendDAO;
 
 public class FriendsAgent extends Agent{
 
-    private User this_user;
+    private User thisUser;
     private User friend;
-    private AID MatchID;
+    private String matchId;
     private String deviceToken;
-    public static final String API_GCM = "AIzaSyCAtOoMnNAj2uzqwebB_zrcxY6KciMwdbo";
+    private int subject;
+//    public static final String API_GCM = "AIzaSyCAtOoMnNAj2uzqwebB_zrcxY6KciMwdbo";
+    public static final String API_GCM = "AAAAUyUzqMQ:APA91bEg6KWwhxMcZjEZDivYAejDNWIfH2zT8N6OKNi-CcFljMLP_tHOl5pk4d_y33miNzFlt1rocVuXVMZZ0bWDTajSV6tzzNfi33N4kk_AcX1hinlPMUWXK9JcsB60Nc0slASL9yMb";
+
     public static final String SENDER_ID = "285662560372";
     private String ANDROID_NOTIFICATION_URL = "https://fcm.googleapis.com/fcm/send";
     //public static final String API_GCM = "AIzaSyDXVkHh-crxkYY73J7OvpLOa3mzufFIlfk";
@@ -75,9 +76,10 @@ public class FriendsAgent extends Agent{
                 try {
                     map = mapper.readValue(message.getContent(), Map.class);
                     Integer id = (Integer) map.get("userId");
-                    this_user = User.read((String) map.get("user"));
+                    thisUser = User.read((String) map.get("user"));
                     friend = DAOFactory.getUserDAO().selectByID(id);
-                    MatchID = new AID((String) map.get("matchAgent"), AID.ISLOCALNAME);
+                    matchId = (String)map.get("matchAgent");
+                    subject = (Integer)map.get("subject");
                     deviceToken = friend.getDeviceToken();
                     if(deviceToken != null) {
                         sendAndroidNotification(deviceToken);
@@ -102,24 +104,6 @@ public class FriendsAgent extends Agent{
                     ACLMessage reply = null;
                     switch(message.getPerformative()) {
                         //get reply from env
-                        case ACLMessage.SUBSCRIBE:
-                            try {
-                                Map<String, Object> map = mapper.readValue(message.getContent(), Map.class);
-                                boolean s = (Boolean) map.get("success");
-                                ACLMessage result = new ACLMessage(ACLMessage.INFORM);
-                                result.addReceiver(MatchID);
-                                Map<String, Object> map2 = new HashMap<String, Object>();
-                                if (s) {
-                                    map2.put("success", true);
-                                } else map2.put("success", false);
-                                String jsonStr = mapper.writeValueAsString(map);
-                                result.setContent(jsonStr);
-                                send(result);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            break;
-
                         //get friend list
                         case ACLMessage.REQUEST:
                             content = message.getContent();
@@ -206,16 +190,20 @@ public class FriendsAgent extends Agent{
         post.setHeader("Authorization", "key="+API_GCM);
 
         JSONObject message = new JSONObject();
-        message.put("user", this_user);
-        message.put("userID", friend.getId());
-        message.put("MatchID", MatchID);
+
         message.put("to", deviceToken);
-        message.put("priority", "high");
 
-        JSONObject notification = new JSONObject();
-        notification.put("title", "Java");
+        JSONObject dataJson = new JSONObject();
 
-        message.put("notification", notification);
+        //dataJson.put("title", "Java");
+        dataJson.put("user", thisUser);
+        dataJson.put("userId", friend.getId());
+        dataJson.put("matchId", matchId);
+        dataJson.put("subject", subject);
+        //dataJson.put("priority", "high");
+
+
+        message.put("data", dataJson);
 
         post.setEntity(new StringEntity(message.toString(), "UTF-8"));
         HttpResponse response = client.execute(post);
