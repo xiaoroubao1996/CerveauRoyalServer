@@ -33,7 +33,7 @@ public class Constant {
 
 
     //Integer
-    public static final long MATCH_WAIT_TIME_MAX = 30000;
+    public static final long MATCH_WAIT_TIME_MAX = 60000;
     public static final long MATCH_EACH_ROUND_TIME_MAX = 25000;
     public static final int SMA_GET = 1;
     public static final int SMA_POST = 2;

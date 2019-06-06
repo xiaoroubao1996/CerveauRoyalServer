@@ -54,7 +54,6 @@ public class DF {
 		template.addServices(sdRank);
 
 		if(nameUserId != null) {
-			//we don't need a service name for searches, just the type
 			ServiceDescription sdUserId = new ServiceDescription();
 			sdUserId.setType("userId");
 			sdUserId.setName(nameUserId);
