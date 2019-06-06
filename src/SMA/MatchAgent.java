@@ -407,23 +407,18 @@ public class MatchAgent extends Agent {
 			ACLMessage message = myAgent.receive(mt);
 			if (message != null) {
 				System.out.println(myAgent.getLocalName() + "--> getSubscribe ");
-				Logger logger = Logger.getLogger(MatchAgent.class.getName());
-				logger.warning(message.getContent());
-				logger.warning("notitest");
 
-				logger.warning("MyNewMessage from myMatchAgent!");
+
 				if(withUser) {
 					ObjectMapper mapper = new ObjectMapper();
 					JsonNode rootNode = null;
 					// read Json
 					try {
-						logger.warning("notitest in try");
 						rootNode = mapper.readTree(message.getContent());
 						boolean success = rootNode.path("success").asBoolean();
 						//case 1-1: play the game with an user and the user accept the request
 						if(success && opponentId != 0) {
 							//get the user2 into this room then goto get the questionDataBehaviour
-							logger.warning("notitest in success");
 							user2 = DAOFactory.getUserDAO().selectByID(opponentId);
 							MessageToReplyUser2 = message.createReply();
 							
