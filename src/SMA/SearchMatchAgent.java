@@ -106,7 +106,7 @@ public class SearchMatchAgent extends Agent {
 				if (matches.size() > 0) {
 					ACLMessage messageToMatch = new ACLMessage(ACLMessage.INFORM);
 					//message.addReceiver(matches.get(0));
-					messageToMatch.addReceiver(new AID(matches.get(0).getName(), AID.ISLOCALNAME));
+					messageToMatch.addReceiver(new AID(matches.get(0).getLocalName(), AID.ISLOCALNAME));
 					messageToMatch.addReplyTo(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME));
 					messageToMatch.setConversationId(ACLMessageFromEnv.getConversationId());
 					//TODO:
