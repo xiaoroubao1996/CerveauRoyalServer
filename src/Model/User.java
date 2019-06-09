@@ -1,8 +1,14 @@
 package Model;
 
-public class User {
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+
+import java.io.IOException;
+import java.io.Serializable;
+
+public class User implements Serializable {
     private Integer id;
-    private String nickName;
+    private String nickname;
     private Integer avatar;
     private String email;
     private String password;
@@ -24,10 +30,12 @@ public class User {
     private Integer numWinCommonsense;
     private Integer numLoseCommonsense;
     private String deviceToken;
+    private Constant.RANK rank;
 
-    public User(Integer id, String nickName, Integer avatar, String email, String password, String deviceToken){
-        this.id = id;
-        this.nickName = nickName;
+    private User(){}
+    public User(String nickname, Integer avatar, String email, String password, String deviceToken){
+        this.id = 0;
+        this.nickname = nickname;
         this.avatar = avatar;
         this.email = email;
         this.password = password;
@@ -49,10 +57,12 @@ public class User {
         this.numWinCommonsense = 0;
         this.numLoseCommonsense = 0;
         this.deviceToken = deviceToken;
+        this.rank = Constant.RANK.PAWN;
     }
-    public User(Integer id, String nickName, Integer avatar, String email, String password, Integer score, Integer numWinLiterature, Integer numLoseLiterature, Integer numWinMath, Integer numLoseMath, Integer numWinArt, Integer numLoseArt, Integer numWinHistory, Integer numLoseHistory, Integer numWinMusic, Integer numLoseMusic, Integer numWinGeography, Integer numLoseGeography, Integer numWinEnglish, Integer numLoseEnglish, Integer numWinCommonsense, Integer numLoseCommonsense, String deviceToken) {
+
+    public User(Integer id, String email, String nickname, Integer avatar,  String password, Integer score, Integer numWinLiterature, Integer numLoseLiterature, Integer numWinMath, Integer numLoseMath, Integer numWinArt, Integer numLoseArt, Integer numWinHistory, Integer numLoseHistory, Integer numWinMusic, Integer numLoseMusic, Integer numWinGeography, Integer numLoseGeography, Integer numWinEnglish, Integer numLoseEnglish, Integer numWinCommonsense, Integer numLoseCommonsense, String deviceToken, String rank) {
         this.id = id;
-        this.nickName = nickName;
+        this.nickname = nickname;
         this.avatar = avatar;
         this.email = email;
         this.password = password;
@@ -74,6 +84,7 @@ public class User {
         this.numWinCommonsense = numWinCommonsense;
         this.numLoseCommonsense = numLoseCommonsense;
         this.deviceToken = deviceToken;
+        this.rank = Constant.RANK.valueOf(rank);
     }
 
     public Integer getId() {
@@ -84,12 +95,12 @@ public class User {
         this.id = id;
     }
 
-    public String getNickName() {
-        return nickName;
+    public String getnickname() {
+        return nickname;
     }
 
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
+    public void setnickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public Integer getAvatar() {
@@ -258,5 +269,90 @@ public class User {
 
     public void setDeviceToken(String deviceToken) {
         this.deviceToken = deviceToken;
+    }
+
+    public Constant.RANK getRank() {
+        return this.rank;
+    }
+
+    public void setRank(Constant.RANK rank) {
+        this.rank = rank;
+    }
+
+    public void setRankByScore(){
+        if(score < 1) {
+            this.rank = Constant.RANK.PAWN;
+        }else if(score < 5){
+            this.rank = Constant.RANK.KNIGHT;
+        }else if(score < 10){
+            this.rank = Constant.RANK.BISHOP;
+        }else if(score < 15){
+            this.rank = Constant.RANK.TOWER;
+        }else if(score > 25){
+            this.rank = Constant.RANK.QUEEN;
+        }
+    }
+
+    public void updateMatchResult(boolean isWin, int subject){
+        if(isWin){
+            score = score + 10;
+        }else{
+            score = score - 10;
+        }
+        if(isWin && subject == 1){
+            numWinGeography ++;
+        }else if(!isWin && subject == 1){
+            numLoseGeography ++;
+        }else if(isWin && subject == 2){
+            numWinLiterature ++;
+        }else if(!isWin && subject == 2){
+            numLoseLiterature ++;
+        }else if(isWin && subject == 3){
+            numWinMath ++;
+        }else if(!isWin && subject == 3){
+            numLoseMath ++;
+        }else if(isWin && subject == 4){
+            numWinHistory ++;
+        }else if(!isWin && subject == 4){
+            numLoseHistory ++;
+        }else if(isWin && subject == 5){
+            numWinArt ++;
+        }else if(!isWin && subject == 5){
+            numLoseArt ++;
+        }else if(isWin && subject == 6){
+            numWinMusic ++;
+        }else if(!isWin && subject == 6){
+            numLoseMusic ++;
+        }else if(isWin && subject == 7){
+            numWinEnglish ++;
+        }else if(!isWin && subject == 7){
+            numLoseEnglish ++;
+        }else if(isWin && subject == 8){
+            numWinCommonsense ++;
+        }else if(!isWin && subject == 8){
+            numLoseCommonsense ++;
+        }
+        }
+
+    public String toJSON() {
+        ObjectMapper mapper = new ObjectMapper();
+        String s = "";
+        try {
+            s = mapper.writeValueAsString(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return s;
+    }
+
+    public static User read(String jsonString) {
+        ObjectMapper mapper = new ObjectMapper();
+        User user = null;
+        try {
+            user = mapper.readValue(jsonString, User.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return user;
     }
 }

@@ -3,19 +3,22 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
          version="4.0">
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
 
     <servlet>
-        <servlet-name>HelloServlet</servlet-name>
-        <servlet-class>servlet.HelloServlet</servlet-class>
+        <servlet-name>SMAServlet</servlet-name>
+        <servlet-class>servlet.SMAServlet</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>HelloServlet</servlet-name>
-        <url-pattern>/servlet/HelloServlet</url-pattern>
+        <servlet-name>SMAServlet</servlet-name>
+        <url-pattern>/*</url-pattern>
     </servlet-mapping>
 
      <listener>
 
-        <listener-class>Llistener.ServletContextJade</listener-class>
+        <listener-class>Listener.ServletContextJade</listener-class>
 
     </listener>
 </web-app>

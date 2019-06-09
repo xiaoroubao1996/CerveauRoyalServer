@@ -1,16 +1,24 @@
 package Model;
 
-public class Question {
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.io.Serializable;
+
+public class Question implements Serializable {
     private Integer id;
-    private String subject;
+    private Integer subject;
     private String text;
     private String option1;
     private String option2;
     private String option3;
     private String option4;
-    private String answer;
+    private Integer answer;
 
-    public Question(Integer id, String subject, String text, String option1, String option2, String option3, String option4, String answer) {
+    private Question(){}
+
+    public Question(Integer id, Integer subject, String text, String option1, String option2, String option3, String option4, Integer answer) {
         this.id = id;
         this.subject = subject;
         this.text = text;
@@ -30,11 +38,11 @@ public class Question {
         this.id = id;
     }
 
-    public String getSubject() {
+    public Integer getSubject() {
         return subject;
     }
 
-    public void setSubject(String subject) {
+    public void setSubject(Integer subject) {
         this.subject = subject;
     }
 
@@ -78,11 +86,33 @@ public class Question {
         this.option4 = option4;
     }
 
-    public String getAnswer() {
+    public Integer getAnswer() {
         return answer;
     }
 
-    public void setAnswer(String answer) {
+    public void setAnswer(Integer answer) {
         this.answer = answer;
+    }
+
+    public String toJSON() {
+        ObjectMapper mapper = new ObjectMapper();
+        String s = "";
+        try {
+            s = mapper.writeValueAsString(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return s;
+    }
+
+    public static Question read(String jsonString) {
+        ObjectMapper mapper = new ObjectMapper();
+        Question question = null;
+        try {
+            question = mapper.readValue(jsonString, Question.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return question;
     }
 }
