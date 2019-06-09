@@ -228,7 +228,7 @@ public class MatchAgent extends Agent {
 						step++;
 						break;
 					} else {
-						block();
+						block(500);
 					}
 
 				//which means one of the users lose his connection
