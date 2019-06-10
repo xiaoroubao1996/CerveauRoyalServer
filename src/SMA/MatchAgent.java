@@ -192,8 +192,6 @@ public class MatchAgent extends Agent {
 		long endTime = System.currentTimeMillis() + Constant.MATCH_EACH_ROUND_TIME_MAX;
 		int user1Res = 0;
 		int user2Res = 0;
-		int correctRes;
-		String msgJson;
         ACLMessage message1 = null;
         ACLMessage message2 = null;
         boolean stop = false;
@@ -215,7 +213,7 @@ public class MatchAgent extends Agent {
 						message1 = receive(mt);
 
 					}
-					if(message2 == null){
+					if(message1 != null && message2 == null){
 						message2 = receive(mt);
 					}
 
@@ -234,48 +232,57 @@ public class MatchAgent extends Agent {
 				//which means one of the users lose his connection
 				}else{
 					step++;
-					iterator = 10;
 					stop = true;
 				}
 				break;
 			case 1:
-				//return the option chosen by another user as well as the score of another user
-				//{"id":id,"matchId":matchId, "index": Index,"answer": answer. "score":score, "stop", stop}
+				if(stop){
+					ACLMessage m = message1.createReply();
+					m.setPerformative(ACLMessage.INFORM);
+					m.addReceiver(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME));
+					String newMessageContent = "{ \"stop\": true}";
+					m.setContent(newMessageContent);
+					myAgent.send(m);
+					iterator = 10;
+				}else {
+					//return the option chosen by another user as well as the score of another user
+					//{"id":id,"matchId":matchId, "index": Index,"answer": answer. "score":score, "stop", stop}
 
-				//To user1
-                ACLMessage m = message1.createReply();
-                m.setPerformative(ACLMessage.INFORM);
-				m.addReceiver(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME));
+					//To user1
+					ACLMessage m = message1.createReply();
+					m.setPerformative(ACLMessage.INFORM);
+					m.addReceiver(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME));
 
-				String newMessageContent = message2.getContent();
-				newMessageContent = newMessageContent.substring(0,newMessageContent.length() - 1); // delete "}"
-				newMessageContent = newMessageContent + ", \"stop\": " + stop + "}";
+					String newMessageContent = message2.getContent();
+					newMessageContent = newMessageContent.substring(0, newMessageContent.length() - 1); // delete "}"
+					newMessageContent = newMessageContent + ", \"stop\": " + stop + "}";
 
-//				m.setContent("{\"id\":\""+user2.getId()+
-//						"\", \"roomId\": \""+matchId+"\",\"score\":\""+user1Score+"\", \"choice\": \""+user1Res+"\"}");
-				m.setContent(newMessageContent);
+					//				m.setContent("{\"id\":\""+user2.getId()+
+					//						"\", \"roomId\": \""+matchId+"\",\"score\":\""+user1Score+"\", \"choice\": \""+user1Res+"\"}");
+					m.setContent(newMessageContent);
 
-				myAgent.send(m);
+					myAgent.send(m);
 
-				//To user2
-				m = message2.createReply();
-				m.setPerformative(ACLMessage.INFORM);
-				m.addReceiver(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME));
+					//To user2
+					m = message2.createReply();
+					m.setPerformative(ACLMessage.INFORM);
+					m.addReceiver(new AID(Constant.ENVIRONEMENT_NAME, AID.ISLOCALNAME));
 
-				newMessageContent = message1.getContent();
-				newMessageContent = newMessageContent.substring(0,newMessageContent.length() - 1); // delete "}"
-				newMessageContent = newMessageContent + ", \"stop\": " + stop + "}";
-				m.setContent(newMessageContent);
+					newMessageContent = message1.getContent();
+					newMessageContent = newMessageContent.substring(0, newMessageContent.length() - 1); // delete "}"
+					newMessageContent = newMessageContent + ", \"stop\": " + stop + "}";
+					m.setContent(newMessageContent);
 
-				myAgent.send(m);
+					myAgent.send(m);
 
-				iterator++;
-                user1Res = 0;
-                user2Res = 0;
-                message1 = null;
-                message2 = null;
-                endTime = System.currentTimeMillis() + Constant.MATCH_EACH_ROUND_TIME_MAX;
-                step = 0;
+					iterator++;
+					user1Res = 0;
+					user2Res = 0;
+					message1 = null;
+					message2 = null;
+					endTime = System.currentTimeMillis() + Constant.MATCH_EACH_ROUND_TIME_MAX;
+					step = 0;
+				}
 				break;
 			}
 
